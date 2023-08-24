@@ -25,3 +25,24 @@
 #container a {
   text-decoration: none;
 }
+
+
+.error {
+  background-color: rgba($color: #F00, $alpha: .3);
+  color: black;
+  border: 1px solid red;
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  
+}
+
+.exito {
+  background-color: rgba($color: #0f0, $alpha: .3);
+  color: black;
+  border: 1px solid #0f0;
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  
+}

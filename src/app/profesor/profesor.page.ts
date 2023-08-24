@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../user.service';
 
 @Component({
-  selector: 'app-profesor', // Asegúrate de usar 'app-profesor' como selector
+  selector: 'app-profesor',
   templateUrl: 'profesor.page.html',
   styleUrls: ['profesor.page.scss']
 })

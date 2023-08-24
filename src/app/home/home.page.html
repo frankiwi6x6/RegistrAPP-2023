@@ -13,27 +13,41 @@
     </ion-toolbar>
   </ion-header>
 
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12">
-          <ion-item>
-            <ion-label position="floating">Usuario:</ion-label>
-            <ion-input type="text" [(ngModel)]="username" placeholder="Ingrese su nombre de usuario..."></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="12">
-          <ion-item>
-            <ion-label position="floating">Contraseña:</ion-label>
-            <ion-input type="password" [(ngModel)]="password" placeholder="Ingrese su contraseña..."></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="12">
-          <ion-button expand="full" (click)="login()">Iniciar sesión</ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+        <ion-item>
+          <ion-label position="floating">Usuario:</ion-label>
+          <ion-input type="text" [(ngModel)]="username" placeholder="Ingrese su nombre de usuario..."></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-item>
+          <ion-label position="floating">Contraseña:</ion-label>
+          <ion-input type="password" [(ngModel)]="password" placeholder="Ingrese su contraseña..."></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <div *ngIf="error" class= "{{ color }}">
+         <p>
+          {{ mensajeError }}
+        </p>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-button expand="full" (click)="login()">Iniciar sesión</ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-button expand="full" color= 'tertiary' (click)="login()">Restablecer contraseña</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
