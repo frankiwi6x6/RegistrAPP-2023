@@ -21,14 +21,21 @@ export const usuarios = [
     username: 'testProfesor',
     password: 'password',
     tipo_usuario: 'profesor',
-    first_name: 'Test',
-    last_name: 'User'
+    first_name: 'Profesor',
+    last_name: 'de prueba'
   },
   {
     username: 'franco',
     password: 'franco',
-    tipo_usuario: 'alumno',
+    tipo_usuario: 'profesor',
     first_name: 'Franco',
     last_name: 'Reyes'
+  },
+  {
+    username: 'ivan',
+    password: 'ivan',
+    tipo_usuario: 'alumno',
+    first_name: 'Iván',
+    last_name: 'Díaz'
   },
 ];
