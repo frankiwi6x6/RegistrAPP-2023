@@ -1,0 +1,14 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      QR Code and Barcode Scanner Demo
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <div id="container">
+    <ion-button (click)="barcodeScanner()">Scan My Code</ion-button>
+    
+    <p>{{scannedOutput}}</p>
+  </div>
+</ion-content>
