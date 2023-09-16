@@ -11,9 +11,10 @@
     </ion-toolbar>
   </ion-header>
 
-  <h2>Bienvenido, <span>{{ currentUser.first_name}} {{ currentUser.last_name}}</span></h2>
+  <h2>Bienvenido, <span *ngIf="alumnoInfo">{{ alumnoInfo.nombre }} {{ alumnoInfo.apellido }}</span></h2>
+
   <div class="logout-button-wrapper">
-    <ion-button class="ion-text-wrap" style="min-width: 200px" expand="block" (click)="escanear()">Leer código QR</ion-button>
+    <ion-button class="ion-text-wrap" style="min-width: 200px" expand="block">Leer código QR</ion-button>
   </div>
   <div class="logout-button-wrapper">
     <ion-button class="ion-text-wrap" style="min-width: 200px" color="danger" (click)="logout()" expand="block">
@@ -21,4 +22,11 @@
       Cerrar sesión
     </ion-button>
   </div>
+  <h1>Asignaturas inscritas</h1>
+  <ion-list>
+    <ion-item *ngFor="let asignatura of asignaturasInscritas">
+      <ion-label>{{ asignatura.nombre }}</ion-label>
+    </ion-item>
+  </ion-list>
+
 </ion-content>

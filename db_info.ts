@@ -1,0 +1,2 @@
+export const DB_URL = 'https://cvzbpsloxihksfjjeihb.supabase.co';
+export const DB_PASSWORD = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2emJwc2xveGloa3NmamplaWhiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5NDg1NzM0MSwiZXhwIjoyMDEwNDMzMzQxfQ.8i-jYgZWVIvsoTU3M_XUJI6fR3YaBfIJa2nq1vFavds'

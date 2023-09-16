@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { EscanearPageRoutingModule } from './escanear-routing.module';
+import { LoadingPagePageRoutingModule } from './loading-page-routing.module';
 
-import { EscanearPage } from './escanear.page';
+import { LoadingPagePage } from './loading-page.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    EscanearPageRoutingModule
+    LoadingPagePageRoutingModule
   ],
-  declarations: [EscanearPage]
+  declarations: [LoadingPagePage]
 })
-export class EscanearPageModule {}
+export class LoadingPagePageModule {}
