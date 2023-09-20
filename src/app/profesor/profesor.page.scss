@@ -1,8 +1,31 @@
 .qr-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-width: 100%; /* Utilizar el máximo tamaño posible */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  /* Utilizar el máximo tamaño posible */
 
-  }
+}
+
+
+/* Estilo para la tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+/* Estilo para las celdas del encabezado */
+th {
+  font-weight: bold;
+  text-align: left;
+  padding: 10px;
+}
+
+/* Estilo para las celdas de datos */
+td {
+  padding: 10px;
+}
+
+/* Estilo para las filas impares (opcional) */

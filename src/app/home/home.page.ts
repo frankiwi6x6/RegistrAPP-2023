@@ -56,8 +56,10 @@ export class HomePage {
       } else if (data) {
         if (data.password === this.password) {
           this.tipoError = 'Inicio de sesión exitoso!';
+          
           console.log('El usuario es ' + data.tipo_usuario)
           this.userService.setCurrentUser(data);
+          localStorage.setItem('usuario', JSON.stringify(this.userService.getCurrentUser()));
           if (data.tipo_usuario === 'alumno') {
             this.router.navigate(['/alumno']);
           } else if (data.tipo_usuario === 'profesor') {

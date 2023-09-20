@@ -13,11 +13,56 @@
 
   <h2>Bienvenido, <span *ngIf="profesorInfo">{{ profesorInfo.nombre }} {{ profesorInfo.apellido }}</span></h2>
   <div class="logout-button-wrapper">
+
+
+
     <ion-button class="ion-text-wrap" style="min-width: 200px" (click)="generateQRCode()" expand="block">Mostrar código
       QR</ion-button>
   </div>
   <div class="qr-container">
     <canvas id="qrcodeCanvas"></canvas>
+  </div>
+
+  <div class="logout-button-wrapper">
+    <ion-button class="ion-text-wrap" style="min-width: 200px" color="secondary" (click)="mostrarTablaAsistencia()"
+      expand="block">
+      Registar asistencia
+    </ion-button>
+  </div>
+
+  <div *ngIf="mostrarTabla">
+    <!-- Tabla para mostrar las secciones -->
+    <ng-container *ngIf="seccionesYAsignaturas">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Sección</th>
+            <th>Asignatura</th>
+            <th>Registrar Asistencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Aquí puedes usar *ngFor para iterar sobre las secciones y mostrarlas en filas -->
+          <tr *ngFor="let seccion of seccionesYAsignaturas.secciones">
+            <td>{{ seccion.id }}</td>
+            <td>{{ seccion.nombre }}</td>
+            <td>{{ buscarAsignatura(seccion.id_asignatura) }}</td>
+            <td>
+              <!-- Botón para registrar la asistencia de esta sección -->
+              <ion-button (click)="registrarAsistencia(seccion)">Registrar</ion-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+
+
+    <!-- Botón para ocultar la tabla -->
+    <ion-button class="ion-text-wrap" style="min-width: 200px" color="secondary" (click)="mostrarTabla = false"
+      expand="block">
+      Ocultar Tabla
+    </ion-button>
   </div>
 
   <div class="logout-button-wrapper">

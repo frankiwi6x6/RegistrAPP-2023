@@ -1,19 +1,12 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  "appId": "io.ionic.starter",
-  "appName": "ProyectoSemestral",
-  "webDir": "www",
-  "plugins": {
-    "QRScanner": {
-      "androidScheme": "https"
-    }
-  },
-  "server": {
+  appId: 'com.example.app',
+  appName: 'RegistrAPP',
+  webDir: 'www',
+  server: {
     androidScheme: 'https'
-
   }
-
 };
 
 export default config;
