@@ -29,18 +29,20 @@ export class AlumnoPage implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.userService.getCurrentUser();
-    this.loadAlumnoInfo();
+    this.obtenerInfoDelAlumno(this.currentUser.id);
     this.loadAsignaturasInscritas();
   }
 
-  async loadAlumnoInfo() {
-    this.alumnoInfoService.getAlumnoInfo(this.currentUser.id)
-      .then(data => {
-        this.alumnoInfo = data[0];
-      })
-      .catch(error => {
-        console.error('Error al cargar la información del alumno:', error);
-      });
+  obtenerInfoDelAlumno(id: string) {
+    this.alumnoInfoService.getAlumnoInfo(id)
+      .subscribe(
+        (data) => {
+          this.alumnoInfo = data[0];
+        },
+        (error) => {
+          console.error('Error al obtener información del alumno:', error);
+        }
+      );
   }
 
   mostrarInfo() {
@@ -56,18 +58,25 @@ export class AlumnoPage implements OnInit {
     } catch (error) {
       console.error('Error al cargar las asignaturas inscritas por el alumno:', error);
     }
-  } 
+  }
 
-  marcarAsistencia() {
+  async marcarAsistencia() {
     if (this.alumnoInfo) {
-      this.asistencia.postAsistencia(this.alumnoInfo.id)
+      // Datos que deseas enviar en la solicitud POST
+      const data: any = {
+        id_clase: 1,
+        id_alumno: this.alumnoInfo.id,
+      };
+
+      // Realiza la solicitud POST
+      this.asistencia.postAsistencia(data)
         .subscribe(
           (respuesta) => {
-            // Manejar la respuesta exitosa
+            // Maneja la respuesta exitosa aquí
             console.log('Respuesta:', respuesta);
           },
           (error) => {
-            // Manejar errores
+            // Maneja los errores aquí
             console.error('Error en la solicitud:', error);
           }
         );
@@ -76,7 +85,7 @@ export class AlumnoPage implements OnInit {
     }
   }
   /*
-Escaneo de QR
+  Escaneo de QR
   const result = await BarcodeScanner.startScan();
   if (result.hasContent) {
     // El código QR ha sido escaneado con éxito, result.text contiene el contenido.

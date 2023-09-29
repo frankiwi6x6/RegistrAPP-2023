@@ -11,17 +11,17 @@
     </ion-toolbar>
   </ion-header>
 
-  <h2>Bienvenido, <span *ngIf="alumnoInfo">{{ alumnoInfo.nombre }} {{ alumnoInfo.apellido }}</span></h2>
-
-  <div class="button-wrapper">
-    <ion-button (click)="marcarAsistencia()">Marcar Asistencia</ion-button>
-
-
-    
+  <div *ngIf="alumnoInfo">
+    <h2>Bienvenido {{ alumnoInfo.nombre }}</h2>
   </div>
-  <ion-button (click)="mostrarInfo()">Mostrar INFO</ion-button>
+  <div class="button-wrapper">
+    <ion-button (click)="marcarAsistencia()"  expand="block">Marcar Asistencia</ion-button>
+  </div>
+  <div class="button-wrapper">
+    <ion-button (click)="mostrarInfo()"  expand="block">Mostrar INFO</ion-button>
+  </div>
 
-  <div class="logout-button-wrapper">
+  <div class="logout-button-wrapper ">
     <ion-button class="ion-text-wrap" style="min-width: 200px" color="danger" (click)="logout()" expand="block">
       <ion-icon name="log-out-outline"></ion-icon>
       Cerrar sesión

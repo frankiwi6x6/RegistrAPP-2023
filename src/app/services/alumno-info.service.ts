@@ -1,33 +1,25 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { api_url, DB_PASSWORD } from 'db_info';
-
 @Injectable({
   providedIn: 'root',
 })
 export class AlumnoInfoService {
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  getAlumnoInfo(id: string) {
+  getAlumnoInfo(id: string): Observable<any> {
+    const url = `${api_url}/alumno?id_usuario=eq.${id}`;
+    const headers = new HttpHeaders({
+      'apikey': `${DB_PASSWORD}`,
+    });
 
-    return fetch(api_url + '/alumno?id_usuario=eq.' + id, {
-      method: 'GET',
-      headers: {
-        'apikey': `${DB_PASSWORD}` // Aquí se agrega la API key en la cabecera
-      }
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('No se pudo acceder a la base de datos');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Aquí puedes trabajar con los datos de la base de datos
-        return data;
-      })
-      .catch(error => {
+    return this.http.get(url, { headers }).pipe(
+      catchError((error) => {
         console.error('Error:', error);
-        throw error;
-      });
+        return throwError('No se pudo acceder a la base de datos');
+      })
+    );
   }
 }

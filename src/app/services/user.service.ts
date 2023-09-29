@@ -11,7 +11,6 @@ export class UserService {
   }
 
   getCurrentUser() {
-    console.log(this.currentUser)
     return this.currentUser;
   }
 }
