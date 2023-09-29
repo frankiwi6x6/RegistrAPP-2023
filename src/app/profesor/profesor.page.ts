@@ -31,7 +31,7 @@ export class ProfesorPage implements OnInit {
     this.currentUser = this.userService.getCurrentUser();
 
     // Llama al servicio para obtener la información del profesor
-    this.getProfesorInfo();
+    this.loadProfesorInfo();
   }
 
   logout(): void {
@@ -50,19 +50,14 @@ export class ProfesorPage implements OnInit {
     });
   }
 
-  getProfesorInfo(): void {
-    this.userId = this.currentUser.id;
-
-    this.profesorInfoService
-      .getProfesorInfo(this.userId)
-      .then((result) => {
-        this.profesorInfo = result;
-        
+  async loadProfesorInfo() {
+    this.profesorInfoService.getProfesorInfo(this.currentUser.id)
+      .then(data => {
+        this.profesorInfo = data[0];
       })
-      .catch((error) => {
-        console.error('Error al obtener la información del profesor:', error);
-      });
+
   }
+
 
   getSeccionesYAsignaturas(): void {
     this.profesorId = this.profesorInfo.id;
@@ -71,7 +66,7 @@ export class ProfesorPage implements OnInit {
       .getSeccionesYAsignaturas(this.profesorId)
       .then((result) => {
         this.seccionesYAsignaturas = result;
-        
+
       })
       .catch((error) => {
         console.error('Error al obtener secciones y asignaturas:', error);

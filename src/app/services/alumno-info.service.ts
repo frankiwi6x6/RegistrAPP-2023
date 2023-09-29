@@ -1,29 +1,33 @@
 import { Injectable } from '@angular/core';
-import { supabase } from '../../../supabase.config';
+import { api_url, DB_PASSWORD } from 'db_info';
 
 @Injectable({
   providedIn: 'root',
 })
-
 export class AlumnoInfoService {
-  constructor() {}
+  constructor() { }
 
-  async getAlumnoInfo(userId: string): Promise<any> {
-    try {
-      const { data, error } = await supabase
-        .from('alumno')
-        .select('id, nombre, apellido, id_usuario, apellido_materno')
-        .eq('id_usuario', userId);
+  getAlumnoInfo(id: string) {
 
-      if (error) {
-        console.error('Error al obtener la información del alumno:', error);
-        throw error;
+    return fetch(api_url + '/alumno?id_usuario=eq.' + id, {
+      method: 'GET',
+      headers: {
+        'apikey': `${DB_PASSWORD}` // Aquí se agrega la API key en la cabecera
       }
-
-      return data ? data[0] : null;
-    } catch (error) {
-      console.error('Error en el servicio AlumnoInfoService:', error);
-      throw error;
-    }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('No se pudo acceder a la base de datos');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Aquí puedes trabajar con los datos de la base de datos
+        return data;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        throw error;
+      });
   }
 }

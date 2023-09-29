@@ -13,11 +13,14 @@
 
   <h2>Bienvenido, <span *ngIf="alumnoInfo">{{ alumnoInfo.nombre }} {{ alumnoInfo.apellido }}</span></h2>
 
-  <div class="logout-button-wrapper">
-    <ion-button (click)="scanQRCode()">Escanear Código QR</ion-button>
+  <div class="button-wrapper">
+    <ion-button (click)="marcarAsistencia()">Marcar Asistencia</ion-button>
 
+
+    
   </div>
-  
+  <ion-button (click)="mostrarInfo()">Mostrar INFO</ion-button>
+
   <div class="logout-button-wrapper">
     <ion-button class="ion-text-wrap" style="min-width: 200px" color="danger" (click)="logout()" expand="block">
       <ion-icon name="log-out-outline"></ion-icon>
