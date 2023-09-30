@@ -61,39 +61,32 @@ export class AlumnoPage implements OnInit {
   }
 
   async marcarAsistencia() {
-    if (this.alumnoInfo) {
-      // Datos que deseas enviar en la solicitud POST
-      const data: any = {
-        id_clase: 1,
-        id_alumno: this.alumnoInfo.id,
-      };
+    const result = await BarcodeScanner.startScan();
+    if (result.hasContent) {
+      console.log('Código QR escaneado:', result.content);
+      if (this.alumnoInfo) {
+        const data: any = {
+          id_clase: result.content,
+          id_alumno: this.alumnoInfo.id,
+        };
 
-      // Realiza la solicitud POST
-      this.asistencia.postAsistencia(data)
-        .subscribe(
-          (respuesta) => {
-            // Maneja la respuesta exitosa aquí
-            console.log('Respuesta:', respuesta);
-          },
-          (error) => {
-            // Maneja los errores aquí
-            console.error('Error en la solicitud:', error);
-          }
-        );
+        // Realizamos la solicitud POST
+        this.asistencia.postAsistencia(data)
+          .subscribe(
+            (respuesta) => {
+              console.log('Respuesta:', respuesta);
+            },
+            (error) => {
+              console.error('Error en la solicitud:', error);
+            }
+          );
+      } else {
+        console.error('this.alumnoInfo no está definido. Asegúrate de cargar la información del alumno antes de llamar a marcarAsistencia().');
+      }
     } else {
-      console.error('this.alumnoInfo no está definido. Asegúrate de cargar la información del alumno antes de llamar a marcarAsistencia().');
+      console.log('Escaneo de código QR cancelado o sin contenido.');
     }
   }
-  /*
-  Escaneo de QR
-  const result = await BarcodeScanner.startScan();
-  if (result.hasContent) {
-    // El código QR ha sido escaneado con éxito, result.text contiene el contenido.
-    console.log('Código QR escaneado:', result.content);
-  } else {
-    // El escaneo fue cancelado o no se encontró ningún código QR.
-    console.log('Escaneo de código QR cancelado o sin contenido.');
-  }*/
 
 
 

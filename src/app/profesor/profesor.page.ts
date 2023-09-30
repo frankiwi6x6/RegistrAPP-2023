@@ -40,8 +40,8 @@ export class ProfesorPage implements OnInit {
     this.router.navigate(['/home']);
   }
 
-  generateQRCode(): void {
-    const qrText = JSON.stringify(this.currentUser);
+  generateQRCode(id_clase: string): void {
+    const qrText = JSON.stringify(id_clase);
 
     QRCode.toCanvas(document.getElementById('qrcodeCanvas'), qrText, (error) => {
       if (error) {
@@ -82,17 +82,13 @@ export class ProfesorPage implements OnInit {
   }
 
   mostrarTablaAsistencia(): void {
-    this.getSeccionesYAsignaturas(); // Llama a tu función para obtener secciones y asignaturas
-    this.mostrarTabla = true; // Muestra la tabla
+    this.getSeccionesYAsignaturas(); 
+    this.mostrarTabla = true; 
   }
   registrarAsistencia(seccion: any): void {
-    // Aquí puedes agregar la lógica para registrar la asistencia de la sección.
-    // Puedes mostrar un cuadro de diálogo, un formulario o realizar cualquier acción
-    // necesaria para registrar la asistencia de los estudiantes de esta sección.
-    // También puedes utilizar el ID de la sección (seccion.id) para identificarla.
-
-    // Ejemplo de acción ficticia (mostrar un mensaje)
+   
     const asignatura = this.buscarAsignatura(seccion.id_asignatura);
+    this.generateQRCode(seccion.id_asignatura)
     alert(`Registrando asistencia para ${asignatura} - Sección ${seccion.nombre}`);
   }
 }
