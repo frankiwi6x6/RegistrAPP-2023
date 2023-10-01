@@ -12,13 +12,11 @@
   </ion-header>
 
   <h2>Bienvenido, <span *ngIf="profesorInfo">{{ profesorInfo.nombre }} {{ profesorInfo.apellido }}</span></h2>
+   <!-- 
   <div class="logout-button-wrapper">
-
-
-
     <ion-button class="ion-text-wrap" style="min-width: 200px" (click)="generateQRCode()" expand="block">Mostrar código
       QR</ion-button>
-  </div>
+  </div> -->
   <div class="qr-container">
     <canvas id="qrcodeCanvas"></canvas>
   </div>
