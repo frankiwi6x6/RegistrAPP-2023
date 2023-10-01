@@ -18,7 +18,7 @@ export class AlumnoPage implements OnInit {
   currentUser: any;
   asignaturasInscritas: any[] = [];
   alumnoInfo: any = null;
-
+  codigoAsignatura: string = '';
   constructor(
     private router: Router,
     private userService: UserService,
@@ -62,9 +62,16 @@ export class AlumnoPage implements OnInit {
 
   async marcarAsistencia() {
     if (this.alumnoInfo) {
+      // Calcula la fecha y hora exactas en este momento
+      const ahora = new Date();
+      const fecha = ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
+      const hora = ahora.getHours() + ':' + ahora.getMinutes() + ':' + ahora.getSeconds();
+
       // Datos que deseas enviar en la solicitud POST
       const data: any = {
-        id_clase: 1,
+        id_asignatura: this.codigoAsignatura,
+        fecha: fecha,
+        hora: hora,
         id_alumno: this.alumnoInfo.id,
       };
 
