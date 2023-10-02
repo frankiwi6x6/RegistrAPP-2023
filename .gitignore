@@ -22,7 +22,6 @@ log.txt
 /www
 /platforms
 /plugins
-
 # Compiled output
 /dist
 /tmp
@@ -66,3 +65,5 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+/db_info.ts

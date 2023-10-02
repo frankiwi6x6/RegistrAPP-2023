@@ -19,7 +19,10 @@ export class HomePage {
   mensajeError: string = '';
   tipoError: string = '';
 
-  constructor(private router: Router, private userService: UserService, private alertCtrl: AlertController) {
+  constructor(
+    private router: Router, 
+    private userService: UserService, 
+    private alertCtrl: AlertController) {
     
   }
 

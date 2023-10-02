@@ -11,30 +11,23 @@
     </ion-toolbar>
   </ion-header>
 
-  <div *ngIf="alumnoInfo">
+  <div *ngIf="alumnoInfo" class="ion-padding">
     <h2>Bienvenido {{ alumnoInfo.nombre }}</h2>
   </div>
-  <div class="button-wrapper">
-    <ion-button (click)="marcarAsistencia()"  expand="block">Marcar Asistencia</ion-button>
-  </div>
-  <div>
-    <input type="text" [(ngModel)]="codigoAsignatura" placeholder="Código de asignatura">
-  </div>
-  <div class="button-wrapper">
-    <ion-button (click)="mostrarInfo()"  expand="block">Mostrar INFO</ion-button>
-  </div>
 
-  <div class="logout-button-wrapper ">
-    <ion-button class="ion-text-wrap" style="min-width: 200px" color="danger" (click)="logout()" expand="block">
-      <ion-icon name="log-out-outline"></ion-icon>
-      Cerrar sesión
-    </ion-button>
-  </div>
-  <h1>Asignaturas inscritas</h1>
+  <ion-item class="input">
+    <ion-input id="inputAsignatura" type="text" [(ngModel)]="codigoAsignatura" color="medium"
+      placeholder="Código de asignatura" input-mode="text"></ion-input>
+  </ion-item>
+
+  <ion-button expand="full" (click)="marcarAsistencia()" class="ion-margin-top">Marcar Asistencia</ion-button>
+
+  <ion-button expand="full" (click)="logout()" color="danger" class="ion-margin-top">Cerrar Sesión</ion-button>
+
+  <h1 class="ion-padding-top ion-padding-start">Asignaturas inscritas</h1>
   <ion-list>
     <ion-item *ngFor="let asignatura of asignaturasInscritas">
       <ion-label>{{ asignatura.nombre }}</ion-label>
     </ion-item>
   </ion-list>
-
 </ion-content>
