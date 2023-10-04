@@ -4,7 +4,7 @@
 RegistrApp es una solución innovadora al problema que se ha generado este ultimo tiempo con respecto a pasar la lista en tiempos de pandemia, 
 RegistrApp ofrecerá un sistema de asistencia mediante escaneo de códigos QR, por ende existirán soluciones moviles (uso de alumnos) y web (uso de profesores).
 
-##Tecnologías Utilizadas.
+## Tecnologías Utilizadas.
 Las tecnologías utilizadas en este proyecto son:
 - Node.js v18.17.1
 - Ionic 7
@@ -43,7 +43,7 @@ Para instalar RegistrApp, sigue estos pasos:
 ### Redirección sección profesor
 ![Sección Profesor](https://cdn.discordapp.com/attachments/687817381485346846/1159222979541073950/image.png?ex=65303d87&is=651dc887&hm=4e9c81bc37257918a1b76dcffce6088105958b0f298b7f68cdfd8525ac3a3339&)
 
-##Actualizaciones y cambios.
+## Actualizaciones y cambios.
 Este proyecto será actualizado constantemente debido a que es parte de nuestra evaluación semestral.
 
-##Gracias por su atención.
+## Gracias por su atención.
