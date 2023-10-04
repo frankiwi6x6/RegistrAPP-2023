@@ -4,6 +4,7 @@ import { UserService } from '../services/user.service';
 import * as QRCode from 'qrcode';
 import { ProfesorInfoService } from '../services/profesor-info.service';
 import { ModalController } from '@ionic/angular';
+import { CrearClaseService } from '../services/crear-clase.service';
 
 @Component({
   selector: 'app-profesor',
@@ -24,7 +25,8 @@ export class ProfesorPage implements OnInit {
     private router: Router,
     private userService: UserService,
     private profesorInfoService: ProfesorInfoService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private clase: CrearClaseService
   ) { }
 
   ngOnInit() {
@@ -81,13 +83,32 @@ export class ProfesorPage implements OnInit {
   }
 
   mostrarTablaAsistencia(): void {
-    this.getSeccionesYAsignaturas(); 
-    this.mostrarTabla = true; 
+    this.getSeccionesYAsignaturas();
+    this.mostrarTabla = true;
   }
   registrarAsistencia(seccion: any): void {
-   
-    const asignatura = this.buscarAsignatura(seccion.id_asignatura);
-    this.generateQRCode(seccion.id_asignatura)
-    alert(`Registrando asistencia para ${asignatura} - Sección ${seccion.nombre}`);
+
+    const ahora = new Date();
+    const fecha = ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
+
+    const data: any = {
+      id_seccion: seccion.id,
+
+    };
+    this.clase.crearClase(data)
+      .subscribe(
+        (respuesta) => {
+          console.log('Respuesta:', respuesta);
+        },
+        (error) => {
+          console.error('Error en la solicitud:', error);
+        }
+      );
+
+
+    // const asignatura = this.buscarAsignatura(seccion.id_asignatura);
+    // this.generateQRCode(seccion.id_asignatura)
+    // alert(`Registrando asistencia para ${asignatura} - Sección ${seccion.nombre}`);
+
   }
 }
