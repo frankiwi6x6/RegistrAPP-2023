@@ -18,22 +18,22 @@ Para instalar RegistrApp, sigue estos pasos:
 
 1. Primero es necesario tener instalado en tu máquina local Node.js y Ionic v7, de lo contrario no podrás ejecutar alguno de estos comandos. 
 2. Clona este repositorio en tu máquina local.
-   ```bash
-   git clone https://github.com/frankiwi6x6/ProyectoMovilSemestral
-   ```
+     ```bash
+     git clone https://github.com/frankiwi6x6/ProyectoMovilSemestral
+     ```
    
 3. Navega al directorio del proyecto
-  ```bash
-   cd ProyectoMovilSemestral
-   ```
-4.  Instalar las dependencias.
-   ```bash
-   npm install
-   ```
+     ```bash
+     cd ProyectoMovilSemestral
+     ```
+4. Instalar las dependencias.
+     ```bash
+     npm install
+     ```
 5. Iniciar la aplicación.
-   ```bash
-   ionic serve
-   ```
+     ```bash
+     ionic serve
+     ```
 
 ## Imagenes de la aplicación
 ### Login de la aplicación
