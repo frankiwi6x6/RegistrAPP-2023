@@ -40,8 +40,7 @@ Para instalar RegistrApp, sigue estos pasos:
 ### Redirección sección alumno
 ![Sección Alumno](https://cdn.discordapp.com/attachments/687817381485346846/1159221563162378352/image.png?ex=65303c35&is=651dc735&hm=8f7dda6df248f12f5d6298d9f563dfb43b3bec79c44b21aa27256dcf170e129e&)
 ### Redirección sección profesor
-![Sección Profesor](https://cdn.discordapp.com/attachments/687817381485346846/1159222979541073950/image.png?ex=65303d87&is=651dc887&hm=4e9c81bc37257918a1b76dcffce6088105958b0f298b7f68cdfd8525ac3a3339&)
-
+![Sección Profesor](https://cdn.discordapp.com/attachments/687817381485346846/1159225516591681656/image.png?ex=65303fe4&is=651dcae4&hm=839790b07abcda30cfa2ff5d8523fa9788aa5e08e4bfdf810c406107b9d71cd9&)
 ## Actualizaciones y cambios.
 Este proyecto será actualizado constantemente debido a que es parte de nuestra evaluación semestral.
 
