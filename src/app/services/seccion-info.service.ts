@@ -10,7 +10,7 @@ export class SeccionInfoService {
 
   async getSeccionesDelProfesor(profesorId: string): Promise<any[]> {
     try {
-      // Obtén las secciones relacionadas con el profesor
+
       const { data: secciones, error: seccionesError } = await supabase
         .from('seccion')
         .select('*')

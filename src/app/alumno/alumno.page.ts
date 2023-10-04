@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
-import { ClaseService } from '../services/clase.service'; // Importa el servicio ClaseService
+import { ClaseService } from '../services/clase.service'; 
 import { AlumnoInfoService } from '../services/alumno-info.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AsistenciaService } from '../services/asistencia.service';
@@ -86,12 +86,10 @@ export class AlumnoPage implements OnInit {
         this.showAlert();
         return;
       } else {
-        // Calcula la fecha y hora exactas en este momento
         const ahora = new Date();
         const fecha = ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
         const hora = ahora.getHours() + ':' + ahora.getMinutes() + ':' + ahora.getSeconds();
 
-        // Datos que deseas enviar en la solicitud POST
         const data: any = {
           id_asignatura: this.codigoAsignatura,
           fecha: fecha,
@@ -99,7 +97,6 @@ export class AlumnoPage implements OnInit {
           id_alumno: this.alumnoInfo.id,
         };
 
-        // Realizamos la solicitud POST
         this.asistencia.postAsistencia(data)
           .subscribe(
             (respuesta) => {
@@ -116,7 +113,7 @@ export class AlumnoPage implements OnInit {
       this.showAlert();
       console.error('this.alumnoInfo no está definido. Asegúrate de cargar la información del alumno antes de llamar a marcarAsistencia().');
 
-      return;
+      return; 
     }
   }
 

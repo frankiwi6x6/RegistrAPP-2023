@@ -30,7 +30,6 @@ export class ProfesorPage implements OnInit {
   ngOnInit() {
     this.currentUser = this.userService.getCurrentUser();
 
-    // Llama al servicio para obtener la información del profesor
     this.loadProfesorInfo();
   }
 

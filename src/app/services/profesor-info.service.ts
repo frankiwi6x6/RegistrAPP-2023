@@ -12,7 +12,7 @@ export class ProfesorInfoService {
     return fetch(api_url + '/profesor?id_usuario=eq.' + id, {
       method: 'GET',
       headers: {
-        'apikey': `${DB_PASSWORD}` // Aquí se agrega la API key en la cabecera
+        'apikey': `${DB_PASSWORD}`
       }
     })
       .then(response => {
@@ -22,7 +22,7 @@ export class ProfesorInfoService {
         return response.json();
       })
       .then(data => {
-        // Aquí puedes trabajar con los datos de la base de datos
+     
         return data;
       })
       .catch(error => {
@@ -32,7 +32,7 @@ export class ProfesorInfoService {
   }
   async getSeccionesYAsignaturas(profesorId: string): Promise<any> {
     try {
-      // Obtén las secciones relacionadas con el profesor
+
       const { data: secciones, error: seccionesError } = await supabase
         .from('seccion')
         .select('*')
@@ -43,7 +43,6 @@ export class ProfesorInfoService {
         throw seccionesError;
       }
 
-      // Obtén las asignaturas relacionadas con las secciones
       const asignaturaIds = secciones.map((seccion) => seccion.id_asignatura);
       const { data: asignaturas, error: asignaturasError } = await supabase
         .from('asignatura')

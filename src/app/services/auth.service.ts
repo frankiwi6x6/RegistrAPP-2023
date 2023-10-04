@@ -4,6 +4,17 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
+  private logueado = false;
 
-  constructor() { }
+  login() {
+    this.logueado = true;
+  }
+
+  logout() {
+    this.logueado = false;
+  }
+
+  isLogueado(): boolean {
+    return this.logueado;
+  }
 }
