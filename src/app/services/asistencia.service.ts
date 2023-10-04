@@ -11,7 +11,7 @@ export class AsistenciaService {
   constructor(private http: HttpClient) { }
 
   postAsistencia(data: any): Observable<any> {
-    const tabla = 'asistencia_prueba';
+    const tabla = 'asistencia_duplicate';
     const url: string = api_url + '/' + tabla;
     
 

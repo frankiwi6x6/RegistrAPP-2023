@@ -48,7 +48,7 @@
             <td>{{ buscarAsignatura(seccion.id_asignatura) }}</td>
             <td>
               <!-- Botón para registrar la asistencia de esta sección -->
-              <ion-button (click)="registrarAsistencia(seccion)">Registrar</ion-button>
+              <ion-button (click)="registrarAsistencia(seccion)"><ion-icon name="play"></ion-icon></ion-button>
             </td>
           </tr>
         </tbody>
@@ -57,7 +57,7 @@
 
 
     <!-- Botón para ocultar la tabla -->
-    <ion-button class="ion-text-wrap" style="min-width: 200px" color="secondary" (click)="mostrarTabla = false"
+    <ion-button class="ion-text-wrap" style="min-width: 200px" color="tertiary" (click)="mostrarTabla = false"
       expand="block">
       Ocultar Tabla
     </ion-button>
