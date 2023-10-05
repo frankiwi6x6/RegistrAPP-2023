@@ -27,7 +27,7 @@ Para instalar RegistrApp, sigue estos pasos:
      ```
 4. Instalar las dependencias.
      ```bash
-     npm install
+     npm install --legacy-peer-deps
      ```
 5. Iniciar la aplicación.
      ```bash
