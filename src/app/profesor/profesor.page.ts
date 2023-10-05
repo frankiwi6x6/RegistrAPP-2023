@@ -98,7 +98,8 @@ export class ProfesorPage implements OnInit {
     this.clase.crearClase(data)
       .subscribe(
         (respuesta) => {
-          console.log('Respuesta:', respuesta);
+          const numeroDeClase = respuesta?.data?.[0]?.id; // Ajusta esto según la estructura de tu respuesta
+          console.log('Número de clase creada:', numeroDeClase);
         },
         (error) => {
           console.error('Error en la solicitud:', error);

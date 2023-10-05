@@ -10,16 +10,15 @@ export class AsistenciaService {
 
   constructor(private http: HttpClient) { }
 
-  postAsistencia(data: any): Observable<any> {
-    const tabla = 'asistencia_duplicate';
-    const url: string = api_url + '/' + tabla;
-    
+  patchAsistenciaPorFechaYAlumno(id_clase:string, fecha: string, idAlumno: number, data: any): Observable<any> {
+    const tabla = 'asistencia';
+    const url: string = `${api_url}/${tabla}?fecha=eq.${fecha}&id_alumno=eq.${idAlumno}&id_clase=eq.${id_clase}`;
 
-    const headers = new HttpHeaders({
+    const headers = {
       'Content-Type': 'application/json',
       'apikey': DB_PASSWORD
-    });
+    };
 
-    return this.http.post(url, data, { headers });
+    return this.http.patch(url, data, { headers });
   }
 }

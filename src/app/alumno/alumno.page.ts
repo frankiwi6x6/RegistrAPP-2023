@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
-import { ClaseService } from '../services/clase.service'; 
+import { ClaseService } from '../services/clase.service';
 import { AlumnoInfoService } from '../services/alumno-info.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AsistenciaService } from '../services/asistencia.service';
@@ -19,7 +19,7 @@ export class AlumnoPage implements OnInit {
   currentUser: any;
   asignaturasInscritas: any[] = [];
   alumnoInfo: any = null;
-  codigoAsignatura: string = '';
+  idClase: string = '';
   tipoError: string = '';
   mensajeError: string = '';
   constructor(
@@ -80,7 +80,7 @@ export class AlumnoPage implements OnInit {
 
   async marcarAsistencia() {
     if (this.alumnoInfo) {
-      if (this.codigoAsignatura === '') {
+      if (this.idClase === '') {
         this.tipoError = 'Error al marcar asistencia.';
         this.mensajeError = 'Debes ingresar el código de la asignatura.';
         this.showAlert();
@@ -91,19 +91,24 @@ export class AlumnoPage implements OnInit {
         const hora = ahora.getHours() + ':' + ahora.getMinutes() + ':' + ahora.getSeconds();
 
         const data: any = {
-          id_asignatura: this.codigoAsignatura,
-          fecha: fecha,
-          hora: hora,
-          id_alumno: this.alumnoInfo.id,
+          isPresente: true,
+          hora: hora
         };
 
-        this.asistencia.postAsistencia(data)
+        this.asistencia.patchAsistenciaPorFechaYAlumno(this.idClase, fecha, this.alumnoInfo.id, data)
           .subscribe(
             (respuesta) => {
-              console.log('Respuesta:', respuesta);
+              // Maneja la respuesta exitosa aquí
+              console.log('Actualización exitosa:', respuesta);
             },
             (error) => {
-              console.error('Error en la solicitud:', error);
+              // Maneja los errores aquí
+              console.error('Error en la actualización:', error);
+              this.tipoError = 'Error al marcar asistencia.';
+              this.mensajeError = 'Usted no pertenece a esta clase.';
+              this.showAlert();
+
+              return;
             }
           );
       }
@@ -113,7 +118,7 @@ export class AlumnoPage implements OnInit {
       this.showAlert();
       console.error('this.alumnoInfo no está definido. Asegúrate de cargar la información del alumno antes de llamar a marcarAsistencia().');
 
-      return; 
+      return;
     }
   }
 
