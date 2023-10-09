@@ -4,6 +4,7 @@ import { usuarios } from '../app.component';
 import { UserService } from '../services/user.service';
 import { AlertController } from '@ionic/angular';
 import { supabase } from '../../../supabase.config';
+import { AlertControllerService } from '../services/alert-controller.service';
 
 
 
@@ -16,32 +17,14 @@ export class HomePage {
 
   username: string = '';
   password: string = '';
-  mensajeError: string = '';
-  tipoError: string = '';
 
   constructor(
-    private router: Router, 
-    private userService: UserService, 
-    private alertCtrl: AlertController) {
-    
+    private router: Router,
+    private userService: UserService,
+    private alertas: AlertControllerService) {
+
   }
 
-  async showAlert() {
-
-
-    await this.alertCtrl.create({
-      header: this.tipoError,
-      message: this.mensajeError,
-      buttons: [{
-        text: 'Entendido',
-        role: 'OK',
-        cssClass: 'alertButton',
-        handler: () => { }
-      }]
-    }).then(res => {
-      res.present();
-    })
-  }
 
   async login(): Promise<void> {
     try {
@@ -49,17 +32,17 @@ export class HomePage {
         .from('usuario')
         .select('*')
         .eq('username', this.username)
-        .single(); 
+        .single();
 
       if (error) {
         console.error('Error al consultar datos:', error);
-        this.tipoError = 'Error al iniciar sesión.';
-        this.mensajeError = 'Ocurrió un error al consultar los datos del usuario.';
-        this.showAlert();
+        this.alertas.tipoError = 'Error al iniciar sesión.';
+        this.alertas.mensajeError = 'Ocurrió un error al consultar los datos del usuario.';
+        this.alertas.showAlert();
       } else if (data) {
         if (data.password === this.password) {
-          this.tipoError = 'Inicio de sesión exitoso!';
-          
+          this.alertas.tipoError = 'Inicio de sesión exitoso!';
+
           console.log('El usuario es ' + data.tipo_usuario)
           this.userService.setCurrentUser(data);
           localStorage.setItem('usuario', JSON.stringify(this.userService.getCurrentUser()));
@@ -72,21 +55,21 @@ export class HomePage {
           this.password = '';
         } else {
           console.log('Contraseña incorrecta');
-          this.tipoError = 'Error al iniciar sesión.';
-          this.mensajeError = 'La contraseña no es correcta, intentelo nuevamente.'
-          this.showAlert();
+          this.alertas.tipoError = 'Error al iniciar sesión.';
+          this.alertas.mensajeError = 'La contraseña no es correcta, intentelo nuevamente.'
+          this.alertas.showAlert();
         }
       } else {
         console.log('Usuario no encontrado');
-        this.tipoError = 'Error al iniciar sesión.';
-        this.mensajeError = 'Usuario no encontrado, intentelo nuevamente.'
-        this.showAlert();
+        this.alertas.tipoError = 'Error al iniciar sesión.';
+        this.alertas.mensajeError = 'Usuario no encontrado, intentelo nuevamente.'
+        this.alertas.showAlert();
       }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
-      this.tipoError = 'Error al iniciar sesión.';
-      this.mensajeError = 'Ocurrió un error al iniciar sesión.';
-      this.showAlert();
+      this.alertas.tipoError = 'Error al iniciar sesión.';
+      this.alertas.mensajeError = 'Ocurrió un error al iniciar sesión.';
+      this.alertas.showAlert();
     }
   }
 
