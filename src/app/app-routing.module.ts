@@ -9,13 +9,8 @@ const routes: Routes = [
     , canActivate: [AuthGuard] 
   },
   {
-    path: 'home',
-    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule)
-    , canActivate: [AuthGuard] 
-  },
-  {
     path: '',
-    redirectTo: 'loading-page',
+    redirectTo: 'login',
     pathMatch: 'full'
     },
   {
@@ -33,6 +28,11 @@ const routes: Routes = [
     loadChildren: () => import('./recuperar-contrasena/recuperar-contrasena.module').then(m => m.RecuperarContrasenaPageModule)
     , canActivate: [AuthGuard]
   },
+  {
+    path: 'login',
+    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
+  },
+
 
 
 

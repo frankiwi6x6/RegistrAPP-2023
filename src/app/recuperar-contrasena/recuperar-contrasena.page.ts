@@ -3,6 +3,7 @@ import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { usuarios } from '../app.component';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-recuperar-contrasena',
@@ -16,7 +17,10 @@ export class RecuperarContrasenaPage {
   confirmarPassword: string = '';
   mensajeError: string = '';
   tipoError: string = '';
-  constructor(private router: Router, private userService: UserService, private alertCtrl: AlertController) { }
+  constructor(
+    private router: Router, 
+    private _auth: AuthService, 
+    private alertCtrl: AlertController) { }
   async showAlert() {
 
 
@@ -50,7 +54,7 @@ export class RecuperarContrasenaPage {
           this.tipoError = 'Contraseña actualizada';
           this.mensajeError = 'La contraseña se ha actualizado correctamente';
           this.showAlert();
-          this.userService.setCurrentUser(user);
+          this._auth.setCurrentUser(user);
           user.password = this.password;
           this.router.navigate(['/home']);
         }

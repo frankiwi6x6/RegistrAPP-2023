@@ -4,17 +4,21 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
-  private logueado = false;
 
-  login() {
-    this.logueado = true;
+  private currentUser: any;
+
+  setCurrentUser(user: any) {
+    this.currentUser = user;
+    localStorage.setItem('currentUser', JSON.stringify(user));
   }
 
-  logout() {
-    this.logueado = false;
+  getCurrentUser() {
+    return this.currentUser;
   }
 
-  isLogueado(): boolean {
-    return this.logueado;
+  logout(){
+    this.currentUser = null;
+    localStorage.removeItem('currentUser');
+    
   }
 }

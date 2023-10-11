@@ -6,6 +6,7 @@ import { AlumnoInfoService } from '../services/alumno-info.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AsistenciaService } from '../services/asistencia.service';
 import { AlertControllerService } from '../services/alert-controller.service';
+import { AuthService } from '../services/auth.service';
 
 
 @Component({
@@ -17,33 +18,44 @@ import { AlertControllerService } from '../services/alert-controller.service';
 
 export class AlumnoPage implements OnInit {
 
-  currentUser: any;
-  asignaturasInscritas: any[] = [];
+  userInfo: any = ''
+  seccionesInscritas: any[] = [];
   alumnoInfo: any = null;
   idClase: string = '';
   isPresente: any = '';
   constructor(
     private router: Router,
-    private userService: UserService,
+    private _auth: AuthService,
     private claseService: ClaseService,
-    private alumnoInfoService: AlumnoInfoService,
+    private _alumno: AlumnoInfoService,
     private asistencia: AsistenciaService,
     private alertas: AlertControllerService
   ) { }
 
   ngOnInit() {
-    this.currentUser = this.userService.getCurrentUser();
-    this.obtenerInfoDelAlumno(this.currentUser.id);
-    this.loadAsignaturasInscritas();
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser !== null) {
+      this.userInfo = JSON.parse(currentUser);
+    }
+    this.obtenerInfoDelAlumno(this.userInfo.id);
+
+
 
   }
 
 
   obtenerInfoDelAlumno(id: string) {
-    this.alumnoInfoService.getAlumnoInfo(id)
+    this._alumno.getAllAlumnoInfo(id)
       .subscribe(
         (data) => {
           this.alumnoInfo = data[0];
+          this.seccionesInscritas = this.alumnoInfo.alumno_seccion
+
+
+          console.log(this.alumnoInfo)
+          console.log(this.seccionesInscritas)
+
+          
         },
         (error) => {
           console.error('Error al obtener información del alumno:', error);
@@ -53,15 +65,6 @@ export class AlumnoPage implements OnInit {
 
 
 
-  async loadAsignaturasInscritas() {
-    try {
-      const asignaturas = await this.claseService.getAsignaturasInscritasPorAlumno(this.currentUser.id);
-
-      this.asignaturasInscritas = asignaturas;
-    } catch (error) {
-      console.error('Error al cargar las asignaturas inscritas por el alumno:', error);
-    }
-  }
 
   async marcarAsistencia() {
     if (this.alumnoInfo) {
@@ -133,10 +136,8 @@ export class AlumnoPage implements OnInit {
 
 
 
-  logout(): void {
-    console.log('Cerrando sesión');
-    this.userService.setCurrentUser(undefined);
-    this.router.navigate(['/home']);
+  logout(){
+    this._auth.logout();
+    this.router.navigateByUrl('login');
   }
-
 }

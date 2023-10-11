@@ -5,6 +5,7 @@ import * as QRCode from 'qrcode';
 import { ProfesorInfoService } from '../services/profesor-info.service';
 import { CrearClaseService } from '../services/crear-clase.service';
 import { AlertControllerService } from '../services/alert-controller.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-profesor',
@@ -13,8 +14,7 @@ import { AlertControllerService } from '../services/alert-controller.service';
 })
 
 export class ProfesorPage implements OnInit {
-
-  currentUser: any;
+  userInfo: any = '';
   profesorInfo: any;
   userId: string;
   profesorId: string;
@@ -27,7 +27,7 @@ export class ProfesorPage implements OnInit {
   fecha: string = '2000-01-01'
   constructor(
     private router: Router,
-    private userService: UserService,
+    private _auth: AuthService,
     private profesorInfoService: ProfesorInfoService,
     private clase: CrearClaseService,
     private alertas: AlertControllerService
@@ -36,15 +36,21 @@ export class ProfesorPage implements OnInit {
   ngOnInit() {
     this.ahora = new Date();
     this.fecha = this.ahora.getFullYear() + '-' + (this.ahora.getMonth() + 1) + '-' + this.ahora.getDate();
-    this.currentUser = this.userService.getCurrentUser();
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser !== null) {
+      this.userInfo = JSON.parse(currentUser);
+    }
     this.loadProfesorInfo();
   }
 
-  logout(): void {
-    console.log('Cerrando sesión');
-    this.userService.setCurrentUser(undefined);
-    this.router.navigate(['/home']);
+
+
+  logout() {
+    this._auth.logout();
+    this.router.navigateByUrl('login');
   }
+
+
 
   generateQRCode(id_clase: string): void {
     const qrText = JSON.stringify(id_clase);
@@ -57,7 +63,7 @@ export class ProfesorPage implements OnInit {
   }
 
   async loadProfesorInfo() {
-    this.profesorInfoService.getProfesorInfo(this.currentUser.id)
+    this.profesorInfoService.getProfesorInfo(this.userInfo.id)
       .then(data => {
         this.profesorInfo = data[0];
       })
@@ -126,7 +132,7 @@ export class ProfesorPage implements OnInit {
             this.alertas.tipoError = 'Registro exitoso!';
             this.alertas.mensajeError = 'Se ha registrado la clase exitosamente.';
             this.alertas.showAlert();
-            this.generateQRCode(respuesta[0].id);
+            // this.generateQRCode(respuesta[0].id);
             this.obtenerInfoDeLaClase(seccion.id, this.fecha);
           },
           (error) => {
@@ -145,7 +151,7 @@ export class ProfesorPage implements OnInit {
       // alert(`Registrando asistencia para ${asignatura} - Sección ${seccion.nombre}`);
     }
     setTimeout(() => {
-      
+
     }, 1000);
 
 

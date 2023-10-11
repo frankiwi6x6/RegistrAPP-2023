@@ -18,13 +18,7 @@
       QR</ion-button>
   </div> -->
 
-  <div *ngIf="claseCreada && fecha ">
-    <h3>Clase del {{infoClase.fecha}} creada:</h3>
-    <h1>ID DE LA CLASE: <span class="text-center">{{infoClase.id}}</span> </h1>
-    <div *ngIf="qrCreado" class="qr-container">
-      <canvas id="qrcodeCanvas"></canvas>
-    </div>
-  </div>
+
   <div class="logout-button-wrapper">
     <ion-button class="ion-text-wrap" style="min-width: 200px" color="secondary" (click)="mostrarTablaAsistencia()"
       expand="block">
@@ -35,6 +29,13 @@
   <div *ngIf="mostrarTabla">
     <!-- Tabla para mostrar las secciones -->
     <ng-container *ngIf="seccionesYAsignaturas">
+      <div *ngIf="claseCreada && fecha ">
+        <h3 class="ion-text-center">Clase del {{infoClase.fecha}} creada:</h3>
+        <h1 class="ion-text-center">ID DE LA CLASE: {{infoClase.id}} </h1>
+        <div *ngIf="qrCreado" class="qr-container">
+          <canvas id="qrcodeCanvas"></canvas>
+        </div>
+      </div>
       <table>
         <thead>
           <tr>

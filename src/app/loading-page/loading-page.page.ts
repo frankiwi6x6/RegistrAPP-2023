@@ -9,7 +9,7 @@ export class LoadingPagePage implements OnInit {
 
   constructor(private router: Router) {
     setTimeout(() => {
-      this.router.navigateByUrl('home');
+      this.router.navigateByUrl('login');
     }, 2000)
   }
 

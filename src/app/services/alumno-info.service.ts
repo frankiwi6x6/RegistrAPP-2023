@@ -10,7 +10,21 @@ export class AlumnoInfoService {
   constructor(private http: HttpClient) { }
 
   getAlumnoInfo(id: string): Observable<any> {
-    const url = `${api_url}/alumno?id_usuario=eq.${id}`;
+    const url = `${api_url}/alumno?select=id_usuario=eq.${id}`;
+    const headers = new HttpHeaders({
+      'apikey': `${DB_PASSWORD}`,
+    });
+
+    return this.http.get(url, { headers }).pipe(
+      catchError((error) => {
+        console.error('Error:', error);
+        return throwError('No se pudo acceder a la base de datos');
+      })
+    );
+  }
+
+   getAllAlumnoInfo(id: string): Observable<any> {
+    const url = `${api_url}/alumno?select=id,nombre,apellido,apellido_materno,id_usuario,alumno_seccion(seccion(asignatura(*)))&id_usuario=eq.${id}`;
     const headers = new HttpHeaders({
       'apikey': `${DB_PASSWORD}`,
     });
