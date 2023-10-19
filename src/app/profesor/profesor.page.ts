@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, numberAttribute } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
 import * as QRCode from 'qrcode';
@@ -6,6 +6,7 @@ import { ProfesorInfoService } from '../services/profesor-info.service';
 import { CrearClaseService } from '../services/crear-clase.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
+import { AsistenciaService } from '../services/asistencia.service';
 
 @Component({
   selector: 'app-profesor',
@@ -25,12 +26,15 @@ export class ProfesorPage implements OnInit {
   seccionesYAsignaturas: any;
   ahora: Date
   fecha: string = '2000-01-01'
+  asistenciaAlumnos: any[] = [];
+  infoSeguridad: any;
   constructor(
     private router: Router,
     private _auth: AuthService,
     private profesorInfoService: ProfesorInfoService,
     private clase: CrearClaseService,
-    private alertas: AlertControllerService
+    private alertas: AlertControllerService,
+    private _asistencia: AsistenciaService
   ) { }
 
   ngOnInit() {
@@ -41,6 +45,7 @@ export class ProfesorPage implements OnInit {
       this.userInfo = JSON.parse(currentUser);
     }
     this.loadProfesorInfo();
+
   }
 
 
@@ -105,8 +110,9 @@ export class ProfesorPage implements OnInit {
       .subscribe(
         (data) => {
           this.infoClase = data[0];
-          console.log(this.infoClase);
           this.claseCreada = true;
+
+          this.crearSeguridad(this.infoClase.id);
         },
         (error) => {
           console.error('Error al obtener información del alumno:', error);
@@ -114,46 +120,108 @@ export class ProfesorPage implements OnInit {
       );
   }
   registrarAsistencia(seccion: any): void {
-
-    this.fecha = this.ahora.getFullYear() + '-' + (this.ahora.getMonth() + 1) + '-' + this.ahora.getDate();
-
-    const data: any = {
+    const fecha = this.obtenerFechaActual();
+    const data = {
       id_seccion: seccion.id,
-      fecha: this.fecha
-
+      fecha,
     };
-    this.obtenerInfoDeLaClase(seccion.id, this.fecha);
+
     if (this.infoClase === undefined) {
+      this.crearYRegistrarClase(data, seccion.id);
+    } else {
+      this.mostrarError('Ya se ha creado clase para esta sección hoy.');
+      // Puedes realizar otras acciones aquí, como generar un código QR.
+    }
+  }
+
+  private obtenerFechaActual(): string {
+    const ahora = new Date();
+    const fecha = ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
+
+    return fecha;
+  }
+
+  private crearYRegistrarClase(data: any, idSeccion: any): void {
+
+    setTimeout(() => {
       this.clase.crearClase(data)
         .subscribe(
           (respuesta) => {
-            // Maneja la respuesta exitosa aquí
             console.log('Registro exitoso:', respuesta);
-            this.alertas.tipoError = 'Registro exitoso!';
-            this.alertas.mensajeError = 'Se ha registrado la clase exitosamente.';
-            this.alertas.showAlert();
-            // this.generateQRCode(respuesta[0].id);
-            this.obtenerInfoDeLaClase(seccion.id, this.fecha);
+            this.mostrarExito('Se ha registrado la clase exitosamente.');
+            this.obtenerInfoDeLaClase(idSeccion, data.fecha);
+
+
+
           },
           (error) => {
+            console.error('Error al crear clase:', error);
+            this.mostrarError('Ya se ha iniciado el registro para esta clase.');
+            this.obtenerInfoDeLaClase(idSeccion, data.fecha);
 
           }
+
         );
+    }, 2000);
 
+    this.obtenerInfoSeguridad(this.infoClase.id, this.infoClase.fecha)
+    this.obtenerAsistencia(this.infoClase.id)
+  }
 
-    } else {
-      this.alertas.tipoError = 'Error al crear clase.';
-      this.alertas.mensajeError = 'Ya se ha creado clase para esta seccion hoy.';
-      this.alertas.showAlert();
+  private mostrarExito(mensaje: string): void {
+    this.alertas.tipoError = 'Registro exitoso';
+    this.alertas.mensajeError = mensaje;
+    this.alertas.showAlert();
+  }
 
-      // const asignatura = this.buscarAsignatura(seccion.id_asignatura);
-      // this.generateQRCode(seccion.id_asignatura)
-      // alert(`Registrando asistencia para ${asignatura} - Sección ${seccion.nombre}`);
+  private mostrarError(mensaje: string): void {
+    this.alertas.tipoError = 'Error al crear clase';
+    this.alertas.mensajeError = mensaje;
+    this.alertas.showAlert();
+  }
+
+  obtenerAsistencia(idClase: string) {
+    const fecha = this.obtenerFechaActual();
+
+    this.clase.getAlumnosPresentes(idClase, fecha).subscribe(
+      (respuesta) => {
+        this.asistenciaAlumnos = respuesta;
+        console.log(respuesta);
+      },
+      (error) => {
+        console.error('Error al obtener información del alumno:', error);
+        console.log(error);
+      }
+    );
+
+  }
+  crearSeguridad(id_clase: string) {
+    const numeroAlAzar = 88888888;
+    const fecha = this.obtenerFechaActual();
+    const data = {
+      clase_id: id_clase,
+      codigo: numeroAlAzar,
+      fecha: fecha
     }
-    setTimeout(() => {
-
-    }, 1000);
-
-
+    this.clase.postSeguridad(data).subscribe(
+      (respuesta) => {
+        console.log(respuesta);
+      },
+      (error) => {
+        console.error('Error al creaer fila en seguridad:', error);
+        console.log(error);
+      }
+    );
+  }
+  obtenerInfoSeguridad(id_clase: string, fecha: string) {
+    this.clase.getSeguridad(id_clase, fecha).subscribe(
+      (respuesta) => {
+        this.infoSeguridad = respuesta;
+        console.log(this.infoSeguridad);
+      },
+      (error) => {
+        console.error('Error al obtener información del alumno:', error);
+        console.log(error);
+      })
   }
 }

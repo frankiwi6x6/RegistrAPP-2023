@@ -32,6 +32,17 @@
       <div *ngIf="claseCreada && fecha ">
         <h3 class="ion-text-center">Clase del {{infoClase.fecha}} creada:</h3>
         <h1 class="ion-text-center">ID DE LA CLASE: {{infoClase.id}} </h1>
+        <div>
+          <h1>Alumnos</h1>
+          <div *ngFor="let alumno of asistenciaAlumnos">
+            <div *ngIf="alumno.isPresente === true" class="alumnoPresente">{{alumno.alumno.nombre}}
+              {{alumno.alumno.apellido}} </div>
+            <div *ngIf="alumno.isPresente !== true" class="alumno">{{alumno.alumno.nombre}} {{alumno.alumno.apellido}}
+            </div>
+
+
+          </div>
+        </div>
         <div *ngIf="qrCreado" class="qr-container">
           <canvas id="qrcodeCanvas"></canvas>
         </div>
@@ -67,6 +78,12 @@
       Ocultar Tabla
     </ion-button>
   </div>
+  <div>
+    <ion-button class="ion-text-wrap" style="min-width: 200px" color="tertiary"
+      (click)="obtenerAsistencia(infoClase.id)" expand="block">
+      Mostrar asistencia
+    </ion-button>
+  </div>
 
   <div class="logout-button-wrapper">
     <ion-button class="ion-text-wrap" style="min-width: 200px" color="danger" (click)="logout()" expand="block">
@@ -74,4 +91,5 @@
       Cerrar sesión
     </ion-button>
   </div>
+
 </ion-content>
