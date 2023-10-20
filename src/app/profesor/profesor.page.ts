@@ -7,7 +7,6 @@ import { CrearClaseService } from '../services/crear-clase.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
 import { AsistenciaService } from '../services/asistencia.service';
-import { info } from 'console';
 
 @Component({
   selector: 'app-profesor',
@@ -31,14 +30,17 @@ export class ProfesorPage implements OnInit {
   infoSeguridad: any;
   tiempoRestante: number = 10;
   intervalId: any;
+  codigoSeguridad: number;
+
 
   constructor(
     private router: Router,
     private _auth: AuthService,
     private profesorInfoService: ProfesorInfoService,
-    private clase: CrearClaseService,
+    private _clase: CrearClaseService,
     private alertas: AlertControllerService,
-    private _asistencia: AsistenciaService
+    private _asistencia: AsistenciaService,
+
   ) { }
 
   ngOnInit() {
@@ -102,7 +104,7 @@ export class ProfesorPage implements OnInit {
   }
 
   obtenerInfoDeLaClase(id: string, dia: string) {
-    this.clase.comprobarClase(id, dia)
+    this._clase.comprobarClase(id, dia)
       .subscribe(
         (data) => {
           if (data === 'La clase ya existe para esta sección y fecha.') {
@@ -121,10 +123,6 @@ export class ProfesorPage implements OnInit {
 
   registrarAsistencia(seccion: any): void {
     const fecha = this.obtenerFechaActual();
-    const data = {
-      id_seccion: seccion.id,
-      fecha,
-    };
 
     if (this.infoClase === undefined) {
       this.obtenerInformacionDeClase(seccion.id, fecha);
@@ -139,47 +137,35 @@ export class ProfesorPage implements OnInit {
   }
 
   private obtenerInformacionDeClase(idSeccion: any, fecha: string): void {
-    this.clase.comprobarClase(idSeccion, fecha).subscribe(
+    this._clase.comprobarClase(idSeccion, fecha).subscribe(
       (respuesta) => {
         if (respuesta.length > 0) {
-          // La fila ya existe, no es necesario crearla nuevamente
           this.infoClase = respuesta[0];
           this.mostrarError('Ya se ha iniciado el registro para esta clase.');
           console.log(this.infoClase);
-          // Obtén la asistencia usando la ID de la clase
           this.obtenerAsistencia(this.infoClase.id);
+          this.obtenerInfoSeguridad(this.infoClase.id, fecha);
         } else {
           const data = {
             id_seccion: idSeccion,
             fecha: fecha
           };
           // La fila no existe, así que la creamos
-          this.clase.crearClase(data).subscribe(
+          this._clase.crearClase(data).subscribe(
             (creacion) => {
               console.log('Registro exitoso:', creacion);
               this.mostrarExito('Se ha registrado la clase exitosamente.');
 
-              // Almacena la ID de la clase creada
               this.infoClase = creacion;
-              // Obtén la asistencia usando la ID de la clase
               this.obtenerAsistencia(this.infoClase.id);
 
-              // Luego, puedes obtener información de seguridad
-              this.clase.getSeguridad(idSeccion, fecha).subscribe(
-                (seguridad) => {
-                  this.infoSeguridad = seguridad;
-                  console.log(this.infoSeguridad);
-                },
-                (error) => {
-                  console.error('Error al obtener información de seguridad:', error);
-                }
-              );
             },
             (error) => {
               console.error('Error al crear clase:', error);
               this.mostrarError('No se pudo crear la clase.');
             }
           );
+
         }
       },
       (error) => {
@@ -189,11 +175,12 @@ export class ProfesorPage implements OnInit {
     );
   }
 
+
   // Función para obtener la asistencia con la ID de la clase
   obtenerAsistencia(idClase: string): void {
     const fecha = this.obtenerFechaActual();
 
-    this.clase.getAlumnosPresentes(idClase, fecha).subscribe(
+    this._clase.getAlumnosPresentes(idClase, fecha).subscribe(
       (respuesta) => {
         this.asistenciaAlumnos = respuesta;
         console.log(respuesta);
@@ -228,7 +215,7 @@ export class ProfesorPage implements OnInit {
       codigo: numeroAlAzar,
       fecha: fecha
     };
-    this.clase.postSeguridad(data).subscribe(
+    this._clase.postSeguridad(data).subscribe(
       (respuesta) => {
         console.log(respuesta);
       },
@@ -240,7 +227,7 @@ export class ProfesorPage implements OnInit {
   }
 
   obtenerInfoSeguridad(id_clase: string, fecha: string) {
-    this.clase.getSeguridad(id_clase, fecha).subscribe(
+    this._clase.getSeguridad(id_clase, fecha).subscribe(
       (respuesta) => {
         this.infoSeguridad = respuesta;
         console.log(this.infoSeguridad);
@@ -259,11 +246,12 @@ export class ProfesorPage implements OnInit {
     this.intervalId = setInterval(() => {
       if (this.infoClase && this.infoClase.id) {
 
-
         if (this.tiempoRestante === 10) {
           // Llamar a la función para obtener la asistencia
-
           this.obtenerAsistencia(this.infoClase.id);
+
+          // Llamar a la función para actualizar el código de seguridad
+          this.actualizarCodigoSeguridad(this.infoClase.id, this.infoClase.fecha);
 
           this.tiempoRestante = 10;
         }
@@ -271,13 +259,43 @@ export class ProfesorPage implements OnInit {
           this.tiempoRestante--; // Restar 1 segundo
         }
         if (this.tiempoRestante === 0) {
-          // Llamar a la función para obtener la asistencia
-
-
           this.tiempoRestante = 10;
         }
-
       }
     }, intervalo);
+  }
+  private generarCodigoSeguridad(): number {
+    const min = 10000000; // Número mínimo de 8 dígitos
+    const max = 99999999; // Número máximo de 8 dígitos
+    const numeroAlAzar: number = Math.floor(Math.random() * (max - min + 1)) + min;
+    return numeroAlAzar;
+  }
+
+
+  private actualizarCodigoSeguridad(id_clase: string, fecha: string) {
+    if (this.codigoSeguridad === undefined) {
+      this.crearSeguridad(id_clase);
+    }
+    const codigo = this.generarCodigoSeguridad();
+    this._clase.patchSeguridad(codigo, id_clase, fecha).subscribe(
+      (respuesta) => {
+        console.log('Código de seguridad actualizado:', respuesta);
+
+        this._clase.getSeguridad(id_clase, fecha).subscribe(
+          (respuesta) => {
+            this.codigoSeguridad = respuesta[0].codigo;
+            
+            console.log(this.codigoSeguridad);
+          },
+          (error) => {
+            console.error('Error al obtener información de seguridad:', error);
+            console.log(error);
+          }
+        );
+      },
+      (error) => {
+        console.error('Error al actualizar código de seguridad:', error);
+      }
+    );
   }
 }

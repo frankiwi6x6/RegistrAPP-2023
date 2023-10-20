@@ -10,7 +10,7 @@ import { DB_PASSWORD, api_url } from 'db_info';
 export class CrearClaseService {
 
   constructor(private http: HttpClient) { }
-  
+
 
   crearClase(data: any): Observable<any> {
     const tabla = 'clase';
@@ -74,5 +74,18 @@ export class CrearClaseService {
       'apikey': DB_PASSWORD
     };
     return this.http.get(url, { headers });
+  }
+
+  patchSeguridad(codigoSeguridad: number, id_clase: string, fecha: string): Observable<any> {
+    const tabla = 'clase_seguridad';
+    const url: string = `${api_url}/${tabla}?select=*&clase_id=eq.${id_clase}&fecha=eq.${fecha}`;
+    const headers = {
+      'Content-Type': 'application/json',
+      'apikey': DB_PASSWORD
+    };
+    const data = {
+      codigo: codigoSeguridad
+    }
+    return this.http.patch(url, data, { headers })
   }
 }

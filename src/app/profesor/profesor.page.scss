@@ -37,3 +37,15 @@ td {
 .alumnoAusente{
   color: red
 }
+
+/* Contenedor de alumnos */
+.alumnos-list {
+  display: flex;
+  flex-wrap: wrap; /* Permite que los elementos se envuelvan en filas adicionales */
+  justify-content: space-between; /* Espacio uniforme entre los elementos */
+}
+
+/* Estilo para todos los alumnos */
+.alumnos-list > div {
+  margin: 5px; /* Espaciado entre todos los elementos */
+}

@@ -32,20 +32,22 @@
       <div *ngIf="infoClase">
         <h3 class="ion-text-center">Clase del {{infoClase.fecha}} creada:</h3>
         <h1 class="ion-text-center">ID DE LA CLASE: {{infoClase.id}} </h1>
+
+        <!-- En tu plantilla HTML -->
+        <h2 class="ion-text-center">Código de seguridad: <span *ngIf="codigoSeguridad" id="codigoSeguridad">{{
+            codigoSeguridad }}</span></h2>
+
         <div>
           <h1>Alumnos</h1>
-          <div *ngFor="let alumno of asistenciaAlumnos">
-            <div *ngIf="alumno.isPresente === true" class="alumnoPresente">{{alumno.alumno.nombre}}
-              {{alumno.alumno.apellido}} </div>
-            <div *ngIf="alumno.isPresente === false" class="alumnoAusente">{{alumno.alumno.nombre}}
-              {{alumno.alumno.apellido}}
+          <div class="alumnos-list">
+            <div *ngFor="let alumno of asistenciaAlumnos">
+              <div [ngClass]="{'alumnoPresente': alumno.isPresente, 'alumnoAusente': !alumno.isPresente}">
+                {{alumno.alumno.nombre}} {{alumno.alumno.apellido}}
+              </div>
             </div>
-
-
           </div>
-          <div>{{ tiempoRestante }} segundos para la próxima obtención de asistencia</div>
-
         </div>
+        <div>{{ tiempoRestante }} segundos para la próxima obtención de asistencia</div>
         <div *ngIf="qrCreado" class="qr-container">
           <canvas id="qrcodeCanvas"></canvas>
         </div>
