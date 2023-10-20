@@ -56,36 +56,5 @@ export class CrearClaseService {
     return this.http.get(url, { headers });
   }
 
-  postSeguridad(data: any): Observable<any> {
-    const tabla = 'clase_seguridad';
-    const url: string = `${api_url}/${tabla}`;
-    const headers = {
-      'Content-Type': 'application/json',
-      'apikey': DB_PASSWORD
-    };
-    return this.http.post(url, data, { headers })
-  }
 
-  getSeguridad(id_clase: string, fecha: string): Observable<any> {
-    const tabla = 'clase_seguridad';
-    const url: string = `${api_url}/${tabla}?select=*&clase_id=eq.${id_clase}&fecha=eq.${fecha}`;
-    console.log(url)
-    const headers = {
-      'apikey': DB_PASSWORD
-    };
-    return this.http.get(url, { headers });
-  }
-
-  patchSeguridad(codigoSeguridad: number, id_clase: string, fecha: string): Observable<any> {
-    const tabla = 'clase_seguridad';
-    const url: string = `${api_url}/${tabla}?select=*&clase_id=eq.${id_clase}&fecha=eq.${fecha}`;
-    const headers = {
-      'Content-Type': 'application/json',
-      'apikey': DB_PASSWORD
-    };
-    const data = {
-      codigo: codigoSeguridad
-    }
-    return this.http.patch(url, data, { headers })
-  }
 }

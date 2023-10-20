@@ -24,6 +24,15 @@
 
       </ion-col>
     </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-item class="input">
+            <ion-input id="inputSeguridad" type="number" [(ngModel)]="codigoSeguridad" color="medium"
+              placeholder="Código de seguridad" input-mode="number"></ion-input>
+          </ion-item>
+
+      </ion-col>
+    </ion-row>
   </ion-grid>
   <ion-button expand="full" (click)="marcarAsistencia()" class="ion-margin-top">Marcar Asistencia</ion-button>
 

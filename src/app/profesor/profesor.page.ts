@@ -7,6 +7,7 @@ import { CrearClaseService } from '../services/crear-clase.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
 import { AsistenciaService } from '../services/asistencia.service';
+import { SeguridadService } from '../services/seguridad.service';
 
 @Component({
   selector: 'app-profesor',
@@ -38,6 +39,7 @@ export class ProfesorPage implements OnInit {
     private _auth: AuthService,
     private profesorInfoService: ProfesorInfoService,
     private _clase: CrearClaseService,
+    private _seguridad: SeguridadService,
     private alertas: AlertControllerService,
     private _asistencia: AsistenciaService,
 
@@ -215,7 +217,7 @@ export class ProfesorPage implements OnInit {
       codigo: numeroAlAzar,
       fecha: fecha
     };
-    this._clase.postSeguridad(data).subscribe(
+    this._seguridad.postSeguridad(data).subscribe(
       (respuesta) => {
         console.log(respuesta);
       },
@@ -227,7 +229,7 @@ export class ProfesorPage implements OnInit {
   }
 
   obtenerInfoSeguridad(id_clase: string, fecha: string) {
-    this._clase.getSeguridad(id_clase, fecha).subscribe(
+    this._seguridad.getSeguridad(id_clase).subscribe(
       (respuesta) => {
         this.infoSeguridad = respuesta;
         console.log(this.infoSeguridad);
@@ -251,7 +253,7 @@ export class ProfesorPage implements OnInit {
           this.obtenerAsistencia(this.infoClase.id);
 
           // Llamar a la función para actualizar el código de seguridad
-          this.actualizarCodigoSeguridad(this.infoClase.id, this.infoClase.fecha);
+          this.actualizarCodigoSeguridad(this.infoClase.id);
 
           this.tiempoRestante = 10;
         }
@@ -272,16 +274,16 @@ export class ProfesorPage implements OnInit {
   }
 
 
-  private actualizarCodigoSeguridad(id_clase: string, fecha: string) {
+  private actualizarCodigoSeguridad(id_clase: string) {
     if (this.codigoSeguridad === undefined) {
       this.crearSeguridad(id_clase);
     }
     const codigo = this.generarCodigoSeguridad();
-    this._clase.patchSeguridad(codigo, id_clase, fecha).subscribe(
+    this._seguridad.patchSeguridad(codigo, id_clase).subscribe(
       (respuesta) => {
         console.log('Código de seguridad actualizado:', respuesta);
 
-        this._clase.getSeguridad(id_clase, fecha).subscribe(
+        this._seguridad.getSeguridad(id_clase).subscribe(
           (respuesta) => {
             this.codigoSeguridad = respuesta[0].codigo;
             

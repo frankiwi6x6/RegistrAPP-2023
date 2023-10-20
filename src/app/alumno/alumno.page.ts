@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from '../services/user.service';
-import { ClaseService } from '../services/clase.service';
 import { AlumnoInfoService } from '../services/alumno-info.service';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { AsistenciaService } from '../services/asistencia.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
+import { SeguridadService } from '../services/seguridad.service';
 
 
 @Component({
@@ -23,23 +22,28 @@ export class AlumnoPage implements OnInit {
   alumnoInfo: any = null;
   idClase: string = '';
   isPresente: any = '';
+  codigoSeguridad: number;
+  codigoDB: number;
+  alumnoPresente: boolean = false;
 
 
   TIPO_ERROR = 'Error al marcar asistencia.';
   TIPO_IS_PRESENTE = 'Usted ya está presente.'
-  TIPO_EXITO= 'Exito al marcar asistencia.'
+  TIPO_EXITO = 'Exito al marcar asistencia.'
   MSJ_EXITO = 'Se ha registrado su asistencia de manera exitosa.';
   MSJ_SIN_USUARIO = 'No existe un usuario logueado, reinicie la aplicacion e intentelo nuevamente.';
   MSJ_SIN_ID_CLASE = 'Debes ingresar el código de la asignatura.';
   MSJ_IS_PRESENTE = 'Ya se ha registrado su asistencia.';
   MSJ_ERROR_MARCADO = 'Ocurrió un error al marcar asistencia.';
+  MSJ_CODIGO_NO_VALIDO = 'El código ingresado no es válido.'
+  MSJ_CODIGO_VACIO = 'Debe ingresar un código de seguridad.'
 
   constructor(
     private router: Router,
     private _auth: AuthService,
-    private claseService: ClaseService,
     private _alumno: AlumnoInfoService,
     private asistencia: AsistenciaService,
+    private _seguridad: SeguridadService,
     private alertas: AlertControllerService
   ) { }
 
@@ -49,9 +53,15 @@ export class AlumnoPage implements OnInit {
       this.userInfo = JSON.parse(currentUser);
     }
     this.obtenerInfoDelAlumno(this.userInfo.id);
+    if (this.alumnoPresente === false) {
+      setInterval(() => {
+        if (this.idClase !== '' && this.alumnoPresente === false)  {
+          this.obtenerCodigoSeguridad(this.idClase);
+        } 
+      }, 2500);
 
 
-
+    }
   }
 
 
@@ -88,32 +98,42 @@ export class AlumnoPage implements OnInit {
 
       if (respuesta[0].isPresente) {
         this.mostrarError(this.TIPO_IS_PRESENTE, this.MSJ_IS_PRESENTE);
+        this.alumnoPresente = true;
         return;
       } else {
         const ahora = new Date();
         const fecha = ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
         const hora = ahora.getHours() + ':' + ahora.getMinutes() + ':' + ahora.getSeconds();
 
+        await this.obtenerCodigoSeguridad(this.idClase)
         const data: any = {
           isPresente: true,
           hora: hora
         };
-        const actualizacionExitosa = await this.asistencia.patchAsistenciaPorFechaYAlumno(this.idClase, fecha, this.alumnoInfo.id, data).toPromise();
+        if (this.codigoSeguridad === this.codigoDB) {
+          const actualizacionExitosa = await this.asistencia.patchAsistenciaPorFechaYAlumno(this.idClase, fecha, this.alumnoInfo.id, data).toPromise();
 
-        if (actualizacionExitosa) {
-          console.log('Ya está presente en esta clase.');
-          // Puedes mostrar un mensaje o tomar otras acciones aquí
+          if (actualizacionExitosa) {
+            console.log('Ya está presente en esta clase.');
+          } else {
+            console.log('Actualización exitosa:', actualizacionExitosa);
+            this.mostrarError(this.TIPO_EXITO, this.MSJ_EXITO);
+            this.alumnoPresente = true;
+
+          }
         } else {
-          console.log('Actualización exitosa:', actualizacionExitosa);
-          this.mostrarError(this.TIPO_EXITO, this.MSJ_EXITO);
-
+          if (this.codigoSeguridad === undefined) {
+            this.mostrarError(this.TIPO_ERROR, this.MSJ_CODIGO_VACIO);
+          } else {
+            this.mostrarError(this.TIPO_ERROR, this.MSJ_CODIGO_NO_VALIDO);
+          }
         }
       }
     } catch (error) {
       console.error('Error al marcar asistencia:', error);
       this.mostrarError(this.TIPO_ERROR, this.MSJ_ERROR_MARCADO);
     }
-   
+
   }
 
   private mostrarError(tipoError: string, mensaje: string) {
@@ -122,7 +142,19 @@ export class AlumnoPage implements OnInit {
     this.alertas.showAlert();
   }
 
+  private obtenerCodigoSeguridad(id_clase: string) {
+    this._seguridad.getSeguridad(id_clase).subscribe(
+      (respuesta) => {
+        this.codigoDB = respuesta[0].codigo;
 
+        console.log(this.codigoDB);
+      },
+      (error) => {
+        console.error('Error al obtener información de seguridad:', error);
+        console.log(error);
+      }
+    );
+  }
 
   logout() {
     this._auth.logout();
