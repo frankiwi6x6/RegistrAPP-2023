@@ -44,4 +44,11 @@ Para instalar RegistrApp, sigue estos pasos:
 ## Actualizaciones y cambios.
 Este proyecto será actualizado constantemente debido a que es parte de nuestra evaluación semestral.
 
+## Ultimas adiciones
+### Sistema de seguridad asistencia
+Se añadió un sistema de seguridad donde se almacena una clave de 8 dígitos, este número se va actualizando cada 10 segundos desde la vista profesor. 
+En la vista alumno se obtiene ese codigo cada 2,5 segundos y cuando el alumno se marca como presente, dejan de hacer peticiones a la api de seguridad.
+### Visualizador de asistencia de alumnos
+Tambien se incluyó un visualizador de alumnos presentes y ausentes, cuando el profesor registra la clase, se despliega una lista con todos los alumnos, los alumnos que se vayan marcando como presentes apareceran en verde y por otra parte los alumnos que no se marquen como presentes quedaran en rojo.
+
 ## Gracias por su atención.
