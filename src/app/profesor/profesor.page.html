@@ -29,7 +29,7 @@
   <div *ngIf="mostrarTabla">
     <!-- Tabla para mostrar las secciones -->
     <ng-container *ngIf="seccionesYAsignaturas">
-      <div *ngIf="claseCreada && fecha ">
+      <div *ngIf="infoClase">
         <h3 class="ion-text-center">Clase del {{infoClase.fecha}} creada:</h3>
         <h1 class="ion-text-center">ID DE LA CLASE: {{infoClase.id}} </h1>
         <div>
@@ -37,11 +37,14 @@
           <div *ngFor="let alumno of asistenciaAlumnos">
             <div *ngIf="alumno.isPresente === true" class="alumnoPresente">{{alumno.alumno.nombre}}
               {{alumno.alumno.apellido}} </div>
-            <div *ngIf="alumno.isPresente !== true" class="alumno">{{alumno.alumno.nombre}} {{alumno.alumno.apellido}}
+            <div *ngIf="alumno.isPresente === false" class="alumnoAusente">{{alumno.alumno.nombre}}
+              {{alumno.alumno.apellido}}
             </div>
 
 
           </div>
+          <div>{{ tiempoRestante }} segundos para la próxima obtención de asistencia</div>
+
         </div>
         <div *ngIf="qrCreado" class="qr-container">
           <canvas id="qrcodeCanvas"></canvas>

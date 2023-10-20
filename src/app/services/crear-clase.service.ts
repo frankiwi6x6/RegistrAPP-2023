@@ -10,12 +10,11 @@ import { DB_PASSWORD, api_url } from 'db_info';
 export class CrearClaseService {
 
   constructor(private http: HttpClient) { }
-  tabla: string = 'clase';
+  
 
   crearClase(data: any): Observable<any> {
-
-    const url: string = api_url + '/' + this.tabla;
-
+    const tabla = 'clase';
+    const url: string = `${api_url}/${tabla}`;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -26,7 +25,8 @@ export class CrearClaseService {
   }
 
   comprobarClase(id_seccion: string, fecha: string): Observable<any> {
-    const url: string = `${api_url}/${this.tabla}?id_seccion=eq.${id_seccion}&fecha=eq.${fecha}`;
+    const tabla = 'clase';
+    const url: string = `${api_url}/${tabla}?id_seccion=eq.${id_seccion}&fecha=eq.${fecha}`;
     console.log(url);
     const headers = new HttpHeaders({
       'apikey': `${DB_PASSWORD}`,
@@ -34,8 +34,13 @@ export class CrearClaseService {
 
     return this.http.get(url, { headers }).pipe(
       catchError((error) => {
-        console.error('Error:', error);
-        return throwError('No se pudo acceder a la base de datos');
+        if (error instanceof HttpErrorResponse && error.status === 409) {
+          // Aquí puedes manejar el caso en el que la clase ya existe
+          return throwError('La clase ya existe para esta sección y fecha.');
+        } else {
+          console.error('Error:', error);
+          return throwError('No se pudo acceder a la base de datos');
+        }
       })
     );
   }
