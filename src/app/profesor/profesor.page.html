@@ -33,7 +33,6 @@
         <h3 class="ion-text-center">Clase del {{infoClase.fecha}} creada:</h3>
         <h1 class="ion-text-center">ID DE LA CLASE: {{infoClase.id}} </h1>
 
-        <!-- En tu plantilla HTML -->
         <h2 class="ion-text-center">Código de seguridad: <span *ngIf="codigoSeguridad" id="codigoSeguridad">{{
             codigoSeguridad }}</span></h2>
 
@@ -62,7 +61,6 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Aquí puedes usar *ngFor para iterar sobre las secciones y mostrarlas en filas -->
           <tr *ngFor="let seccion of seccionesYAsignaturas.secciones">
             <td>{{ seccion.id }}</td>
             <td>{{ seccion.nombre }}</td>
