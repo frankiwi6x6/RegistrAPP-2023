@@ -36,7 +36,7 @@ export class AsistenciaService {
   getEstadoAlumno(id_clase: string, idAlumno: number,): Observable<any> {
     const tabla = 'asistencia';
     const url: string = `${api_url}/${tabla}?id_alumno=eq.${idAlumno}&id_clase=eq.${id_clase}&select=isPresente`;
-
+  
     const headers = {
       'Content-Type': 'application/json',
       'apikey': DB_PASSWORD

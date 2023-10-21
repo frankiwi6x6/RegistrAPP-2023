@@ -37,7 +37,7 @@
             codigoSeguridad }}</span></h2>
 
         <div>
-          <h1>Alumnos</h1>
+          <h1 class="ion-text-center">Alumnos</h1>
           <div class="alumnos-list">
             <div *ngFor="let alumno of asistenciaAlumnos">
               <div [ngClass]="{'alumnoPresente': alumno.isPresente, 'alumnoAusente': !alumno.isPresente}">
@@ -81,12 +81,7 @@
       Ocultar Tabla
     </ion-button>
   </div>
-  <div>
-    <ion-button class="ion-text-wrap" style="min-width: 200px" color="tertiary"
-      (click)="obtenerAsistencia(infoClase.id)" expand="block">
-      Mostrar asistencia
-    </ion-button>
-  </div>
+  
 
   <div class="logout-button-wrapper">
     <ion-button class="ion-text-wrap" style="min-width: 200px" color="danger" (click)="logout()" expand="block">

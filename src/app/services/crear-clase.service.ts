@@ -47,7 +47,7 @@ export class CrearClaseService {
 
   getAlumnosPresentes(id_clase: string, fecha: string): Observable<any> {
     const tabla = 'asistencia';
-    const url: string = `${api_url}/${tabla}?select=alumno(nombre,apellido),isPresente&fecha=eq.${fecha}&id_clase=eq.${id_clase}`;
+    const url: string = `${api_url}/${tabla}?select=alumno(nombre,apellido),isPresente&fecha=eq.${fecha}&id_clase=eq.${id_clase}&order=alumno(apellido)`;
     console.log(url)
     const headers = {
       'apikey': DB_PASSWORD

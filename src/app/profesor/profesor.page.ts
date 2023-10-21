@@ -135,7 +135,7 @@ export class ProfesorPage implements OnInit {
 
   private obtenerFechaActual(): string {
     const ahora = new Date();
-    return ahora.toISOString().split('T')[0];
+    return ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
   }
 
   private obtenerInformacionDeClase(idSeccion: any, fecha: string): void {
@@ -181,7 +181,6 @@ export class ProfesorPage implements OnInit {
   // Función para obtener la asistencia con la ID de la clase
   obtenerAsistencia(idClase: string): void {
     const fecha = this.obtenerFechaActual();
-
     this._clase.getAlumnosPresentes(idClase, fecha).subscribe(
       (respuesta) => {
         this.asistenciaAlumnos = respuesta;
@@ -286,7 +285,7 @@ export class ProfesorPage implements OnInit {
         this._seguridad.getSeguridad(id_clase).subscribe(
           (respuesta) => {
             this.codigoSeguridad = respuesta[0].codigo;
-            
+
             console.log(this.codigoSeguridad);
           },
           (error) => {
