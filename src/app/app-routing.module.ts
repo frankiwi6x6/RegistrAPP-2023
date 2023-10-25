@@ -6,13 +6,13 @@ const routes: Routes = [
   {
     path: 'loading-page',
     loadChildren: () => import('./loading-page/loading-page.module').then(m => m.LoadingPagePageModule)
-    , canActivate: [AuthGuard] 
+    , canActivate: [AuthGuard]
   },
   {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
-    },
+  },
   {
     path: 'alumno',
     loadChildren: () => import('./alumno/alumno.module').then(m => m.AlumnoPageModule)
@@ -30,9 +30,18 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
+    loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)
+  },
+  {
+    path: 'not-found',
+    loadChildren: () => import('./not-found/not-found.module').then(m => m.NotFoundPageModule)
   },
 
+  {
+    path: '**',
+    redirectTo: 'not-found',
+    pathMatch: 'full'
+  },
 
 
 
