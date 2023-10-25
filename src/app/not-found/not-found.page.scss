@@ -1,6 +1,19 @@
 .tituloNotFound {
-    font-size: 40px;
+    font-size: 46px;
     height: 100%;
     display: block;
     vertical-align: middle;
+}
+
+@media (prefers-color-scheme: dark) {
+
+    .foto {
+        filter: invert(1);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+
+    .foto {
+    }
 }
