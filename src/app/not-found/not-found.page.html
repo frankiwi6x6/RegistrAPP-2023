@@ -1,16 +1,25 @@
-<ion-content [fullscreen]="true">
+<ion-header [translucent]="false">
 
-
-  <div>
-    <ion-row class="ion-align-items-center">
-
-      <img class="foto" src="../../assets/not-found.png" alt="ícono not found" height="40px" width="40px">
-
-      <h1 class="tituloNotFound">
-        Página no encontrada
-      </h1>
-    </ion-row>
+  <div class="content-center">
+    <h1 class="tituloNotFound ion-text-center">
+      Página no encontrada &nbsp; <ion-icon name="sad"></ion-icon>
+    </h1>
   </div>
-  <ion-button (click)="volverAHome()">Volver al home</ion-button>
+
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-row class="ion-align-items-center">
+
+    <ion-col size='12'>
+
+      <ion-row class="ion-align-items-center">
+        <ion-col size="12" size-md="6" class="ion-align-self-center">
+          <p class="textoNotFound">La página que estás buscando no existe o no se encuentra disponible.</p>
+          <p>Estado: 404</p>
+        </ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-row>
+  <ion-button expand="full" (click)="volverAHome()">Volver al home</ion-button>
 
 </ion-content>

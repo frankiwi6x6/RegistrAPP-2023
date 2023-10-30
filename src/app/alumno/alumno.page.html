@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="false">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Alumno</ion-title>
@@ -18,6 +18,7 @@
     <ion-row>
       <ion-col size="12">
         <ion-item class="input">
+          
             <ion-input id="inputAsignatura" type="text" [(ngModel)]="idClase" color="medium"
               placeholder="Código de asignatura" input-mode="text"></ion-input>
           </ion-item>

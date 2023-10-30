@@ -41,23 +41,31 @@ export class ProfesorPage implements OnInit {
     private _clase: CrearClaseService,
     private _seguridad: SeguridadService,
     private alertas: AlertControllerService,
-    private _asistencia: AsistenciaService,
 
   ) { }
 
   ngOnInit() {
-    this.ahora = new Date();
-    this.fecha = this.ahora.getFullYear() + '-' + (this.ahora.getMonth() + 1) + '-' + this.ahora.getDate();
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser !== null) {
-      this.userInfo = JSON.parse(currentUser);
-    }
-    this.loadProfesorInfo();
-    this.iniciarObtenerAsistenciaAutomatica();
-
+    this._auth.getCurrentUser().then(user => {
+      if (user) {
+        this.userInfo = user;
+        console.log(this.userInfo);
+        this.ahora = new Date();
+        this.fecha = this.ahora.getFullYear() + '-' + (this.ahora.getMonth() + 1) + '-' + this.ahora.getDate();
+        this.loadProfesorInfo();
+        if (this.profesorInfo !== undefined) {
+          this.getSeccionesYAsignaturas();
+        } else {
+          this.loadProfesorInfo();
+        }
+        this.iniciarObtenerAsistenciaAutomatica();
+      } else {
+        this.router.navigateByUrl('login');
+      }
+    });
   }
 
   logout() {
+    this.infoClase = undefined;
     this._auth.logout();
     this.router.navigateByUrl('login');
   }
@@ -156,11 +164,13 @@ export class ProfesorPage implements OnInit {
           this._clase.crearClase(data).subscribe(
             (creacion) => {
               console.log('Registro exitoso:', creacion);
-              this.mostrarExito('Se ha registrado la clase exitosamente.');
+              this.mostrarExito('Se ha registrado la clase exitosamente');
 
               this.infoClase = creacion;
               this.obtenerAsistencia(this.infoClase.id);
 
+              // Llamar a la función para obtener la información de la clase recién creada
+              this.obtenerInformacionDeClase(this.infoClase.id, this.infoClase.fecha);
             },
             (error) => {
               console.error('Error al crear clase:', error);

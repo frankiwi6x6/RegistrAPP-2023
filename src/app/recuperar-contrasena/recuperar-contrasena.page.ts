@@ -71,6 +71,6 @@ export class RecuperarContrasenaPage {
     }
   }
   retroceder(): void{
-    this.router.navigate(['/home']);
+    this.router.navigateByUrl('login');
   }
 }

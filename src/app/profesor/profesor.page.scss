@@ -4,31 +4,24 @@
   align-items: center;
   justify-content: center;
   max-width: 100%;
-  /* Utilizar el máximo tamaño posible */
 
 }
-
-
-/* Estilo para la tabla */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
 }
 
-/* Estilo para las celdas del encabezado */
 th {
   font-weight: bold;
   text-align: left;
   padding: 10px;
 }
 
-/* Estilo para las celdas de datos */
 td {
   padding: 10px;
 }
 
-/* Estilo para las filas impares (opcional) */
 
 
 .alumnoPresente{
@@ -38,15 +31,14 @@ td {
   color: red
 }
 
-/* Contenedor de alumnos */
 .alumnos-list {
   display: flex;
-  flex-wrap: wrap; /* Permite que los elementos se envuelvan en filas adicionales */
-  justify-content: space-between; /* Espacio uniforme entre los elementos */
+  flex-wrap: wrap; 
+  justify-content: space-between; 
   font-weight: 700;
 }
 
-/* Estilo para todos los alumnos */
+
 .alumnos-list > div {
-  margin: 10px; /* Espaciado entre todos los elementos */
+  margin: 10px;
 }

@@ -25,7 +25,7 @@ export class AlumnoPage implements OnInit {
   codigoSeguridad: number;
   codigoDB: number;
   alumnoPresente: boolean = false;
-
+  result: Promise<any>;
 
   TIPO_ERROR = 'Error al marcar asistencia.';
   TIPO_IS_PRESENTE = 'Usted ya está presente.'
@@ -48,20 +48,26 @@ export class AlumnoPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser !== null) {
-      this.userInfo = JSON.parse(currentUser);
-    }
-    this.obtenerInfoDelAlumno(this.userInfo.id);
-    if (this.alumnoPresente === false) {
-      setInterval(() => {
-        if (this.idClase !== '' && this.alumnoPresente === false)  {
-          this.obtenerCodigoSeguridad(this.idClase);
-        } 
-      }, 2500);
+    this._auth.getCurrentUser().then(user => {
+      if (user) {
+        this.userInfo = user;
+        console.log(this.userInfo);
+        this.obtenerInfoDelAlumno(this.userInfo.id);
+        if (this.alumnoPresente === false) {
+          setInterval(() => {
+            if (this.idClase !== '' && this.alumnoPresente === false) {
+              this.obtenerCodigoSeguridad(this.idClase);
+            }
+          }, 2500);
 
 
-    }
+        }
+      } else {
+        this.router.navigateByUrl('login');
+      }
+    });
+
+
   }
 
 
@@ -157,6 +163,7 @@ export class AlumnoPage implements OnInit {
   }
 
   logout() {
+    this.userInfo = undefined;
     this._auth.logout();
     this.router.navigateByUrl('login');
   }

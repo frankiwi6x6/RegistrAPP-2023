@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="false">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Profesor</ion-title>
@@ -46,7 +46,12 @@
             </div>
           </div>
         </div>
-        <div>{{ tiempoRestante }} segundos para la próxima obtención de asistencia</div>
+        <div>
+          <ion-icon name="time-outline"></ion-icon> &nbsp;
+          <span *ngIf="tiempoRestante<10">0{{ tiempoRestante }}</span>
+          <span *ngIf="tiempoRestante>=10">{{ tiempoRestante }}</span>
+          segundos para la próxima obtención de asistencia
+        </div>
         <div *ngIf="qrCreado" class="qr-container">
           <canvas id="qrcodeCanvas"></canvas>
         </div>
@@ -81,7 +86,7 @@
       Ocultar Tabla
     </ion-button>
   </div>
-  
+
 
   <div class="logout-button-wrapper">
     <ion-button class="ion-text-wrap" style="min-width: 200px" color="danger" (click)="logout()" expand="block">
