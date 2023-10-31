@@ -45,7 +45,6 @@ export class LoginPage implements OnInit {
             } else {
               console.log('Usuario encontrado');
               this._auth.setCurrentUser(this.infoUser);
-
               if (this.infoUser.tipo_usuario === 'profesor') {
                 console.log('Usuario profesor');
                 this.router.navigateByUrl(this.infoUser.tipo_usuario);
