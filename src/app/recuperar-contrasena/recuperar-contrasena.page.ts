@@ -18,8 +18,9 @@ export class RecuperarContrasenaPage {
   mensajeError: string = '';
   tipoError: string = '';
   constructor(
-    private router: Router, 
-    private _auth: AuthService, 
+    private router: Router,
+    private _auth: AuthService,
+    private _user: UserService,
     private alertCtrl: AlertController) { }
   async showAlert() {
 
@@ -37,40 +38,49 @@ export class RecuperarContrasenaPage {
       res.present();
     })
   }
+
   recuperarContrasena(): void {
-    const user = usuarios.find(u => u.username === this.username);
-    if (this.password != this.confirmarPassword) {
+    if (this.password !== this.confirmarPassword) {
       this.mensajeError = 'Las contraseñas no coinciden';
       this.tipoError = 'Error.';
       this.showAlert();
     } else {
-
-      if (user) {
-        if (user.password === this.password) {
-          this.mensajeError = 'La contraseña nueva no puede ser igual a la anterior';
-          this.tipoError = 'Error.';
-          this.showAlert();
-        } else {
-          this.tipoError = 'Contraseña actualizada';
-          this.mensajeError = 'La contraseña se ha actualizado correctamente';
-          this.showAlert();
-          this._auth.setCurrentUser(user);
-          user.password = this.password;
-          this.router.navigate(['/home']);
+      this._user.getUserInfo(this.username, this.password).subscribe(
+        (user) => {
+          if (user) {
+            if (user.password === this.password) {
+              this.mensajeError = 'La contraseña nueva no puede ser igual a la anterior';
+              this.tipoError = 'Error.';
+              this.showAlert();
+            } else {
+              this.tipoError = 'Contraseña actualizada';
+              this.mensajeError = 'La contraseña se ha actualizado correctamente';
+              this.showAlert();
+              this._user.passwordRecovery(this.username, this.password).subscribe(
+                () => {
+                  // Contraseña actualizada en la base de datos
+                },
+                (error) => {
+                  console.error('Error al actualizar la contraseña en la base de datos:', error);
+                  // Maneja el error apropiadamente
+                }
+              );
+              this.router.navigate(['/login']);
+            }
+          } else {
+            this.mensajeError = 'El usuario no existe';
+            this.tipoError = 'Error.';
+            this.showAlert();
+          }
+        },
+        (error) => {
+          console.error('Error al recuperar información del usuario:', error);
+          // Maneja el error apropiadamente
         }
-
-      } else{
-        this.mensajeError = 'El usuario no existe';
-        this.tipoError = 'Error.';
-        this.showAlert();  
-      }
-
-
-
-
+      );
     }
   }
-  retroceder(): void{
+  retroceder(): void {
     this.router.navigateByUrl('login');
   }
 }

@@ -53,8 +53,11 @@ export class LoginPage implements OnInit {
                 console.log('Usuario alumno');
                 this.router.navigateByUrl(this.infoUser.tipo_usuario);
               }
+
+              this.username = '';
+              this.password = '';
             }
-            this.username = '';
+
             this.password = '';
 
 

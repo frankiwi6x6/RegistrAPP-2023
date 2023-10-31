@@ -65,8 +65,9 @@ export class ProfesorPage implements OnInit {
   }
 
   logout() {
-    this.infoClase = undefined;
     this._auth.logout();
+    this.infoClase = '';
+    this.userInfo = '';
     this.router.navigateByUrl('login');
   }
 
@@ -167,10 +168,15 @@ export class ProfesorPage implements OnInit {
               this.mostrarExito('Se ha registrado la clase exitosamente');
 
               this.infoClase = creacion;
-              this.obtenerAsistencia(this.infoClase.id);
+              this._clase.comprobarClase(idSeccion, fecha).subscribe(
+                (respuesta) => {
+                  this.infoClase = respuesta[0];
+                  console.log(this.infoClase);
+                  this.obtenerAsistencia(this.infoClase.id);
+                  this.obtenerInfoSeguridad(this.infoClase.id, fecha);
+                });
 
-              // Llamar a la función para obtener la información de la clase recién creada
-              this.obtenerInformacionDeClase(this.infoClase.id, this.infoClase.fecha);
+
             },
             (error) => {
               console.error('Error al crear clase:', error);
