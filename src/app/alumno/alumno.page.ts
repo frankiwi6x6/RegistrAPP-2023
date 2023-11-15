@@ -26,6 +26,7 @@ export class AlumnoPage implements OnInit {
   codigoDB: number;
   alumnoPresente: boolean = false;
   resultadoScanner: any = '';
+  content_visibility = ''
 
   TIPO_ERROR = 'Error al marcar asistencia.';
   TIPO_IS_PRESENTE = 'Usted ya está presente.'
@@ -129,7 +130,7 @@ export class AlumnoPage implements OnInit {
   }
 
   async escanearQR() {
-    this.escanearQR();
+    this.escanear();
     if (this.resultadoScanner !== '') {
       this.idClase = this.resultadoScanner.id_clase;
       this.codigoSeguridad = this.resultadoScanner.codigo_seguridad;
@@ -174,10 +175,12 @@ export class AlumnoPage implements OnInit {
     }
   }
   dejarEscanear() {
+    
     BarcodeScanner.showBackground();
     BarcodeScanner.stopScan();
     const elemento: any = document.querySelector('body')
     elemento.classList.remove('scanner-active');
+    this.content_visibility = ''
   }
   async escanear() {
     try {
@@ -188,12 +191,16 @@ export class AlumnoPage implements OnInit {
       await BarcodeScanner.hideBackground();
       const elemento: any = document.querySelector('body')
       elemento.classList.add('scanner-active');
+      this.content_visibility = 'hidden'
       const result = await BarcodeScanner.startScan();
       console.log(result)
+      this.dejarEscanear();
+      this.content_visibility = ''
+      
       if (result?.hasContent) {
         this.resultadoScanner = result.content;
+        
         console.log(this.resultadoScanner)
-        this.dejarEscanear();
         this.alertas.tipoError = 'Resultado del escaneo';
         this.alertas.mensajeError = this.resultadoScanner;
         this.alertas.showAlert();

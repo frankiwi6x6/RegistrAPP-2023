@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="false">
+<ion-content [fullscreen]="false" [style.visibility] = "content_visibility">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Alumno</ion-title>
@@ -35,7 +35,7 @@
     </ion-row>
   </ion-grid>
   
-  <ion-button expand="full" (click)="escanearQR()" class="ion-margin-top">Escanear QR</ion-button>
+  <ion-button expand="full" (click)="escanear()" class="ion-margin-top">Escanear QR</ion-button>
   <ion-button expand="full" (click)="marcarAsistencia()" class="ion-margin-top">Marcar Asistencia</ion-button>
 
   <ion-button expand="full" (click)="logout()" color="danger" class="ion-margin-top">Cerrar Sesión</ion-button>
