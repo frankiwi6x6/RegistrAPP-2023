@@ -25,7 +25,7 @@ export class AlumnoPage implements OnInit {
   codigoSeguridad: number;
   codigoDB: number;
   alumnoPresente: boolean = false;
-  result: Promise<any>;
+  resultadoScanner: any = '';
 
   TIPO_ERROR = 'Error al marcar asistencia.';
   TIPO_IS_PRESENTE = 'Usted ya está presente.'
@@ -129,21 +129,11 @@ export class AlumnoPage implements OnInit {
   }
 
   async escanearQR() {
-    const result = await BarcodeScanner.startScan();
-    
-    if (result.hasContent) {
-      const scannedData = result.content;
-      // Assuming the scanned data is in the format you expect (JSON with id_clase and codigo_seguridad)
-      const parsedData = JSON.parse(scannedData);
-      
-      // Now you can use parsedData.id_clase and parsedData.codigo_seguridad as needed
-      this.idClase = parsedData.id_clase;
-      this.codigoSeguridad = parsedData.codigo_seguridad;
-
-
-      this.marcarAsistencia();  
-    } else {
-      console.log('Scan was canceled or failed');
+    this.escanearQR();
+    if (this.resultadoScanner !== '') {
+      this.idClase = this.resultadoScanner.id_clase;
+      this.codigoSeguridad = this.resultadoScanner.codigo_seguridad;
+      this.marcarAsistencia();
     }
   }
 
@@ -170,5 +160,48 @@ export class AlumnoPage implements OnInit {
     this.userInfo = undefined;
     this._auth.logout();
     this.router.navigateByUrl('login');
+  }
+  async verPermisos() {
+    try {
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      if (status.granted) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error al obtener permisos:', error);
+      return false;
+    }
+  }
+  dejarEscanear() {
+    BarcodeScanner.showBackground();
+    BarcodeScanner.stopScan();
+    const elemento: any = document.querySelector('body')
+    elemento.classList.remove('scanner-active');
+  }
+  async escanear() {
+    try {
+      const permiso = await this.verPermisos();
+      if (!permiso) {
+        return;
+      }
+      await BarcodeScanner.hideBackground();
+      const elemento: any = document.querySelector('body')
+      elemento.classList.add('scanner-active');
+      const result = await BarcodeScanner.startScan();
+      console.log(result)
+      if (result?.hasContent) {
+        this.resultadoScanner = result.content;
+        console.log(this.resultadoScanner)
+        this.dejarEscanear();
+
+      }
+    } catch (error) {
+      console.error('Error al escanear:', error);
+      this.dejarEscanear();
+    }
+  }
+  beforeDestroy() {
+    BarcodeScanner.stopScan();
   }
 }
