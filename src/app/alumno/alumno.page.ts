@@ -1,11 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+
+import { DialogService } from '../services/dialog.service';
 import { AlumnoInfoService } from '../services/alumno-info.service';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import {
+  Barcode,
+  BarcodeFormat,
+  BarcodeScanner,
+  LensFacing,
+} from '@capacitor-mlkit/barcode-scanning';
 import { AsistenciaService } from '../services/asistencia.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
 import { SeguridadService } from '../services/seguridad.service';
+import { BarcodeScanningModalComponent } from './barcode-scaning-modal.component';
 
 
 @Component({
@@ -16,6 +25,19 @@ import { SeguridadService } from '../services/seguridad.service';
 
 
 export class AlumnoPage implements OnInit {
+
+  public readonly barcodeFormat = BarcodeFormat;
+  public readonly lensFacing = LensFacing;
+
+  public formGroup = new UntypedFormGroup({
+    formats: new UntypedFormControl([]),
+    lensFacing: new UntypedFormControl(LensFacing.Back),
+    googleBarcodeScannerModuleInstallState: new UntypedFormControl(0),
+    googleBarcodeScannerModuleInstallProgress: new UntypedFormControl(0),
+  });
+  public barcodes: Barcode[] = [];
+  public isSupported = false;
+  public isPermissionGranted = false;
 
   userInfo: any = ''
   seccionesInscritas: any[] = [];
@@ -45,10 +67,34 @@ export class AlumnoPage implements OnInit {
     private _alumno: AlumnoInfoService,
     private asistencia: AsistenciaService,
     private _seguridad: SeguridadService,
-    private alertas: AlertControllerService
+    private alertas: AlertControllerService,
+    private readonly ngZone: NgZone,
+    private readonly dialogService: DialogService
   ) { }
 
   ngOnInit() {
+    BarcodeScanner.isSupported().then((result) => {
+      this.isSupported = result.supported;
+    });
+    BarcodeScanner.checkPermissions().then((result) => {
+      this.isPermissionGranted = result.camera === 'granted';
+    });
+    BarcodeScanner.removeAllListeners().then(() => {
+      BarcodeScanner.addListener(
+        'googleBarcodeScannerModuleInstallProgress',
+        (event) => {
+          this.ngZone.run(() => {
+            console.log('googleBarcodeScannerModuleInstallProgress', event);
+            const { state, progress } = event;
+            this.formGroup.patchValue({
+              googleBarcodeScannerModuleInstallState: state,
+              googleBarcodeScannerModuleInstallProgress: progress,
+            });
+          });
+        }
+      );
+    });
+
     this._auth.getCurrentUser().then(user => {
       if (user) {
         this.userInfo = user;
@@ -130,7 +176,6 @@ export class AlumnoPage implements OnInit {
   }
 
   async escanearQR() {
-    this.escanear();
     if (this.resultadoScanner !== '') {
       this.idClase = this.resultadoScanner.id_clase;
       this.codigoSeguridad = this.resultadoScanner.codigo_seguridad;
@@ -162,56 +207,48 @@ export class AlumnoPage implements OnInit {
     this._auth.logout();
     this.router.navigateByUrl('login');
   }
-  async verPermisos() {
-    try {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-      if (status.granted) {
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error al obtener permisos:', error);
-      return false;
-    }
-  }
-  dejarEscanear() {
-    
-    BarcodeScanner.showBackground();
-    BarcodeScanner.stopScan();
-    const elemento: any = document.querySelector('body')
-    elemento.classList.remove('scanner-active');
-    this.content_visibility = ''
-  }
-  async escanear() {
-    try {
-      const permiso = await this.verPermisos();
-      if (!permiso) {
-        return;
-      }
-      await BarcodeScanner.hideBackground();
-      const elemento: any = document.querySelector('body')
-      elemento.classList.add('scanner-active');
-      this.content_visibility = 'hidden'
-      const result = await BarcodeScanner.startScan();
-      console.log(result)
-      this.dejarEscanear();
-      this.content_visibility = ''
-      
-      if (result?.hasContent) {
-        this.resultadoScanner = result.content;
-        
-        console.log(this.resultadoScanner)
-        this.alertas.tipoError = 'Resultado del escaneo';
-        this.alertas.mensajeError = this.resultadoScanner;
-        this.alertas.showAlert();
 
+  public async startScan(): Promise<void> {
+    const formats = this.formGroup.get('formats')?.value || [];
+    const lensFacing =
+      this.formGroup.get('lensFacing')?.value || LensFacing.Back;
+    const element = await this.dialogService.showModal({
+      component: BarcodeScanningModalComponent,
+      // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
+      cssClass: 'barcode-scanning-modal',
+      showBackdrop: false,
+      componentProps: {
+        formats: formats,
+        lensFacing: lensFacing,
+      },
+    });
+    element.onDidDismiss().then((result) => {
+      const barcode: Barcode | undefined = result.data?.barcode;
+      if (barcode) {
+        this.barcodes = [barcode];
       }
-    } catch (error) {
-      console.error('Error al escanear:', error);
-      this.dejarEscanear();
-    }
+    });
   }
-  beforeDestroy() {
-    BarcodeScanner.stopScan();
+
+
+
+  public async scan(): Promise<void> {
+    const formats = this.formGroup.get('formats')?.value || [];
+    const { barcodes } = await BarcodeScanner.scan({
+      formats,
+    });
+    this.barcodes = barcodes;
+  }
+
+  public async openSettings(): Promise<void> {
+    await BarcodeScanner.openSettings();
+  }
+
+  public async installGoogleBarcodeScannerModule(): Promise<void> {
+    await BarcodeScanner.installGoogleBarcodeScannerModule();
+  }
+
+  public async requestPermissions(): Promise<void> {
+    await BarcodeScanner.requestPermissions();
   }
 }
