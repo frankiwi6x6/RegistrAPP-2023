@@ -209,28 +209,33 @@ export class AlumnoPage implements OnInit {
   }
 
   public async startScan(): Promise<void> {
-    const formats = this.formGroup.get('formats')?.value || [];
-    const lensFacing =
-      this.formGroup.get('lensFacing')?.value || LensFacing.Back;
-    const element = await this.dialogService.showModal({
-      component: BarcodeScanningModalComponent,
-      // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
-      cssClass: 'barcode-scanning-modal',
-      showBackdrop: false,
-      componentProps: {
-        formats: formats,
-        lensFacing: lensFacing,
-      },
-    });
-    element.onDidDismiss().then((result) => {
-      const barcode: Barcode | undefined = result.data?.barcode;
-      if (barcode) {
-        this.barcodes = [barcode];
-      }
-    });
+    try {
+      const formats = this.formGroup.get('formats')?.value || [];
+      const lensFacing =
+        this.formGroup.get('lensFacing')?.value || LensFacing.Back;
+      const element = await this.dialogService.showModal({
+        component: BarcodeScanningModalComponent,
+        // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
+        cssClass: 'barcode-scanning-modal',
+        showBackdrop: false,
+        componentProps: {
+          formats: formats,
+          lensFacing: lensFacing,
+        },
+      });
+      element.onDidDismiss().then((result) => {
+        const barcode: Barcode | undefined = result.data?.barcode;
+        if (barcode) {
+          this.barcodes = [barcode];
+        }
+      });
+    }
+    catch (error){
+      this.alertas.tipoError = 'Error'
+      this.alertas.mensajeError = 'Error: ',error;
+      
+    }
   }
-
-
 
   public async scan(): Promise<void> {
     const formats = this.formGroup.get('formats')?.value || [];
