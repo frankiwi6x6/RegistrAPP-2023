@@ -12,11 +12,8 @@
   </ion-header>
 
   <h2>Bienvenido, <span *ngIf="profesorInfo">{{ profesorInfo.nombre }} {{ profesorInfo.apellido }}</span></h2>
-  <!-- 
-  <div class="logout-button-wrapper">
-    <ion-button class="ion-text-wrap" style="min-width: 200px" (click)="generateQRCode()" expand="block">Mostrar código
-      QR</ion-button>
-  </div> -->
+
+
 
 
   <div class="logout-button-wrapper">
@@ -30,6 +27,12 @@
     <!-- Tabla para mostrar las secciones -->
     <ng-container *ngIf="seccionesYAsignaturas">
       <div *ngIf="infoClase">
+
+        <ion-row *ngIf="qrCreado">
+          <ion-col size="12" class="ion-text-center">
+            <canvas id="qrcodeCanvas"></canvas>
+          </ion-col>
+        </ion-row>
         <h3 class="ion-text-center">Clase del {{infoClase.fecha}} creada:</h3>
         <h1 class="ion-text-center">ID DE LA CLASE: {{infoClase.id}} </h1>
 
@@ -52,9 +55,7 @@
           <span *ngIf="tiempoRestante>=10">{{ tiempoRestante }}</span>
           segundos para la próxima obtención de asistencia
         </div>
-        <div *ngIf="qrCreado" class="qr-container">
-          <canvas id="qrcodeCanvas"></canvas>
-        </div>
+
       </div>
       <table>
         <thead>

@@ -71,14 +71,20 @@ export class ProfesorPage implements OnInit {
     this.router.navigateByUrl('login');
   }
 
-  generateQRCode(id_clase: string): void {
-    const qrText = JSON.stringify(id_clase);
+  generateQRCode(id_clase: string, codigo_seguridad: string): void {
+    this.qrCreado = true;
+    const qrText = JSON.stringify({ id_clase: id_clase, codigo_seguridad: codigo_seguridad });
+    setTimeout(() => {
+      QRCode.toCanvas(document.getElementById('qrcodeCanvas'), qrText, (error) => {
+        if (error) {
+          console.error('Error al generar el código QR:', error);
+        } else {
+          this.qrCreado = true;
+        }
+      });
 
-    QRCode.toCanvas(document.getElementById('qrcodeCanvas'), qrText, (error) => {
-      if (error) {
-        console.error('Error al generar el código QR:', error);
-      }
-    });
+    }, 25
+    );
   }
 
   async loadProfesorInfo() {
@@ -177,6 +183,7 @@ export class ProfesorPage implements OnInit {
                 });
 
 
+
             },
             (error) => {
               console.error('Error al crear clase:', error);
@@ -266,10 +273,8 @@ export class ProfesorPage implements OnInit {
         if (this.tiempoRestante === 10) {
           // Llamar a la función para obtener la asistencia
           this.obtenerAsistencia(this.infoClase.id);
-
           // Llamar a la función para actualizar el código de seguridad
           this.actualizarCodigoSeguridad(this.infoClase.id);
-
           this.tiempoRestante = 10;
         }
         if (this.tiempoRestante > 0) {
@@ -301,8 +306,8 @@ export class ProfesorPage implements OnInit {
         this._seguridad.getSeguridad(id_clase).subscribe(
           (respuesta) => {
             this.codigoSeguridad = respuesta[0].codigo;
-
             console.log(this.codigoSeguridad);
+            this.generateQRCode(id_clase, this.codigoSeguridad.toString());
           },
           (error) => {
             console.error('Error al obtener información de seguridad:', error);
@@ -315,4 +320,5 @@ export class ProfesorPage implements OnInit {
       }
     );
   }
+
 }

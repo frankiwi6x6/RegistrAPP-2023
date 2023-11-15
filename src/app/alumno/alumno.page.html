@@ -31,10 +31,11 @@
             <ion-input id="inputSeguridad" type="number" [(ngModel)]="codigoSeguridad" color="medium"
               placeholder="Código de seguridad" input-mode="number"></ion-input>
           </ion-item>
-
       </ion-col>
     </ion-row>
   </ion-grid>
+  
+  <ion-button expand="full" (click)="escanearQR()" class="ion-margin-top">Escanear QR</ion-button>
   <ion-button expand="full" (click)="marcarAsistencia()" class="ion-margin-top">Marcar Asistencia</ion-button>
 
   <ion-button expand="full" (click)="logout()" color="danger" class="ion-margin-top">Cerrar Sesión</ion-button>

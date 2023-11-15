@@ -59,17 +59,12 @@ export class AlumnoPage implements OnInit {
               this.obtenerCodigoSeguridad(this.idClase);
             }
           }, 2500);
-
-
         }
       } else {
         this.router.navigateByUrl('login');
       }
     });
-
-
   }
-
 
   obtenerInfoDelAlumno(id: string) {
     this._alumno.getAllAlumnoInfo(id)
@@ -77,12 +72,8 @@ export class AlumnoPage implements OnInit {
         (data) => {
           this.alumnoInfo = data[0];
           this.seccionesInscritas = this.alumnoInfo.alumno_seccion
-
-
           console.log(this.alumnoInfo)
           console.log(this.seccionesInscritas)
-
-
         },
         (error) => {
           console.error('Error al obtener información del alumno:', error);
@@ -101,7 +92,6 @@ export class AlumnoPage implements OnInit {
     }
     try {
       const respuesta = await this.asistencia.getEstadoAlumno(this.idClase, this.alumnoInfo.id).toPromise();
-
       if (respuesta[0].isPresente) {
         this.mostrarError(this.TIPO_IS_PRESENTE, this.MSJ_IS_PRESENTE);
         this.alumnoPresente = true;
@@ -110,7 +100,6 @@ export class AlumnoPage implements OnInit {
         const ahora = new Date();
         const fecha = ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
         const hora = ahora.getHours() + ':' + ahora.getMinutes() + ':' + ahora.getSeconds();
-
         await this.obtenerCodigoSeguridad(this.idClase)
         const data: any = {
           isPresente: true,
@@ -118,14 +107,12 @@ export class AlumnoPage implements OnInit {
         };
         if (this.codigoSeguridad === this.codigoDB) {
           const actualizacionExitosa = await this.asistencia.patchAsistenciaPorFechaYAlumno(this.idClase, fecha, this.alumnoInfo.id, data).toPromise();
-
           if (actualizacionExitosa) {
             console.log('Ya está presente en esta clase.');
           } else {
             console.log('Actualización exitosa:', actualizacionExitosa);
             this.mostrarError(this.TIPO_EXITO, this.MSJ_EXITO);
             this.alumnoPresente = true;
-
           }
         } else {
           if (this.codigoSeguridad === undefined) {
@@ -139,7 +126,6 @@ export class AlumnoPage implements OnInit {
       console.error('Error al marcar asistencia:', error);
       this.mostrarError(this.TIPO_ERROR, this.MSJ_ERROR_MARCADO);
     }
-
   }
 
   private mostrarError(tipoError: string, mensaje: string) {
@@ -147,12 +133,26 @@ export class AlumnoPage implements OnInit {
     this.alertas.mensajeError = mensaje;
     this.alertas.showAlert();
   }
+  async escanearQR() {
+    const result = await BarcodeScanner.startScan();
+    
+    if (result.hasContent) {
+      const scannedData = result.content;
+      // Assuming the scanned data is in the format you expect (JSON with id_clase and codigo_seguridad)
+      const parsedData = JSON.parse(scannedData);
+      
+      // Now you can use parsedData.id_clase and parsedData.codigo_seguridad as needed
+      this.idClase = parsedData.id_clase;
+      this.codigoSeguridad = parsedData.codigo_seguridad;
+    } else {
+      console.log('Scan was canceled or failed');
+    }
+  }
 
   private obtenerCodigoSeguridad(id_clase: string) {
     this._seguridad.getSeguridad(id_clase).subscribe(
       (respuesta) => {
         this.codigoDB = respuesta[0].codigo;
-
         console.log(this.codigoDB);
       },
       (error) => {
