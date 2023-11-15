@@ -194,6 +194,9 @@ export class AlumnoPage implements OnInit {
         this.resultadoScanner = result.content;
         console.log(this.resultadoScanner)
         this.dejarEscanear();
+        this.alertas.tipoError = 'Resultado del escaneo';
+        this.alertas.mensajeError = this.resultadoScanner;
+        this.alertas.showAlert();
 
       }
     } catch (error) {
