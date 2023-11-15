@@ -128,11 +128,6 @@ export class AlumnoPage implements OnInit {
     }
   }
 
-  private mostrarError(tipoError: string, mensaje: string) {
-    this.alertas.tipoError = tipoError;
-    this.alertas.mensajeError = mensaje;
-    this.alertas.showAlert();
-  }
   async escanearQR() {
     const result = await BarcodeScanner.startScan();
     
@@ -144,9 +139,18 @@ export class AlumnoPage implements OnInit {
       // Now you can use parsedData.id_clase and parsedData.codigo_seguridad as needed
       this.idClase = parsedData.id_clase;
       this.codigoSeguridad = parsedData.codigo_seguridad;
+
+
+      this.marcarAsistencia();  
     } else {
       console.log('Scan was canceled or failed');
     }
+  }
+
+  private mostrarError(tipoError: string, mensaje: string) {
+    this.alertas.tipoError = tipoError;
+    this.alertas.mensajeError = mensaje;
+    this.alertas.showAlert();
   }
 
   private obtenerCodigoSeguridad(id_clase: string) {
