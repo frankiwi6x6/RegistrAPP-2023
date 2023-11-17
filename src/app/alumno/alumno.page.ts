@@ -16,6 +16,7 @@ import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
 import { SeguridadService } from '../services/seguridad.service';
 import { BarcodeScanningModalComponent } from './barcode-scanning-modal.component';
+import { type } from 'os';
 
 
 @Component({
@@ -39,7 +40,7 @@ export class AlumnoPage implements OnInit {
   public barcodes: Barcode[] = [];
   public isSupported = false;
   public isPermissionGranted = false;
-
+  QR: any = '';
   userInfo: any = ''
   seccionesInscritas: any[] = [];
   alumnoInfo: any = null;
@@ -59,7 +60,7 @@ export class AlumnoPage implements OnInit {
   MSJ_SIN_ID_CLASE = 'Debes ingresar el código de la asignatura.';
   MSJ_IS_PRESENTE = 'Ya se ha registrado su asistencia.';
   MSJ_ERROR_MARCADO = 'Ocurrió un error al marcar asistencia.';
-  MSJ_CODIGO_NO_VALIDO = 'El código ingresado no es válido.'
+  MSJ_CODIGO_NO_VALIDO = 'El código de seguridad ingresado no es válido'
   MSJ_CODIGO_VACIO = 'Debe ingresar un código de seguridad.'
 
   constructor(
@@ -107,7 +108,7 @@ export class AlumnoPage implements OnInit {
             if (this.idClase !== '' && this.alumnoPresente === false) {
               this.obtenerCodigoSeguridad(this.idClase);
             }
-          }, 2500);
+          }, 5000);
         }
       } else {
         this.router.navigateByUrl('login');
@@ -130,17 +131,17 @@ export class AlumnoPage implements OnInit {
       );
   }
 
-  async marcarAsistencia() {
+  async marcarAsistencia(idClase: string, codigoDeSeguridad: string) {
     if (!this.alumnoInfo) {
       this.mostrarError(this.TIPO_ERROR, this.MSJ_SIN_USUARIO);
       return;
     }
-    if (this.idClase === '') {
+    if (idClase === '') {
       this.mostrarError(this.TIPO_ERROR, this.MSJ_SIN_ID_CLASE);
       return;
     }
     try {
-      const respuesta = await this.asistencia.getEstadoAlumno(this.idClase, this.alumnoInfo.id).toPromise();
+      const respuesta = await this.asistencia.getEstadoAlumno(idClase, this.alumnoInfo.id).toPromise();
       if (respuesta[0].isPresente) {
         this.mostrarError(this.TIPO_IS_PRESENTE, this.MSJ_IS_PRESENTE);
         this.alumnoPresente = true;
@@ -149,13 +150,13 @@ export class AlumnoPage implements OnInit {
         const ahora = new Date();
         const fecha = ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
         const hora = ahora.getHours() + ':' + ahora.getMinutes() + ':' + ahora.getSeconds();
-        await this.obtenerCodigoSeguridad(this.idClase)
+        await this.obtenerCodigoSeguridad(idClase)
         const data: any = {
           isPresente: true,
           hora: hora
         };
-        if (this.codigoSeguridad === this.codigoDB) {
-          const actualizacionExitosa = await this.asistencia.patchAsistenciaPorFechaYAlumno(this.idClase, fecha, this.alumnoInfo.id, data).toPromise();
+        if (parseInt(codigoDeSeguridad) === this.codigoDB) {
+          const actualizacionExitosa = await this.asistencia.patchAsistenciaPorFechaYAlumno(idClase, fecha, this.alumnoInfo.id, data).toPromise();
           if (actualizacionExitosa) {
             console.log('Ya está presente en esta clase.');
           } else {
@@ -164,7 +165,7 @@ export class AlumnoPage implements OnInit {
             this.alumnoPresente = true;
           }
         } else {
-          if (this.codigoSeguridad === undefined) {
+          if (codigoDeSeguridad === undefined) {
             this.mostrarError(this.TIPO_ERROR, this.MSJ_CODIGO_VACIO);
           } else {
             this.mostrarError(this.TIPO_ERROR, this.MSJ_CODIGO_NO_VALIDO);
@@ -226,28 +227,31 @@ export class AlumnoPage implements OnInit {
     });
   }
 
-  public async readBarcodeFromImage(): Promise<void> {
-    const { files } = await FilePicker.pickImages({ multiple: false });
-    const path = files[0]?.path;
-    if (!path) {
-      return;
-    }
-    const formats:any = this.barcodeFormat.QrCode;
-    const { barcodes } = await BarcodeScanner.readBarcodesFromImage({
-      path,
-      formats,
-    });
-    this.barcodes = barcodes;
-  }
 
   public async scan(): Promise<void> {
-    const formats:any = this.barcodeFormat.QrCode;
-    const { barcodes } = await BarcodeScanner.scan({
-      formats,
-    });
-    this.barcodes = barcodes;
+    try {
+      const formats: any = this.barcodeFormat.QrCode;
+      const { barcodes } = await BarcodeScanner.scan({
+        formats,
+      });
+      this.barcodes = barcodes;
+      this.QR = JSON.parse(this.barcodes[0].rawValue);
+    //   this.alertas.tipoError = 'Resultado del escaneo';
+    //   this.alertas.mensajeError = `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase }`  + `
+    //   Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad }
+    //   `;
+      this.alertas.showAlert();
+      this.idClase = this.QR.id_clase;
+      this.codigoSeguridad = this.QR.codigo_seguridad;
+      console.log(this.idClase);
+      console.log(this.codigoSeguridad);
+      this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
+    }
+    catch (error) {
+      // this.alertas.tipoError = 'Error al escanear';
+      // this.alertas.mensajeError = `${error}`;
+    }
   }
-
   public async installGoogleBarcodeScannerModule(): Promise<void> {
     await BarcodeScanner.installGoogleBarcodeScannerModule();
   }
