@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { ScannerPageRoutingModule } from './scanner-routing.module';
-
+import { BarcodeScanningModalComponent } from './barcode-scaning-modal.component';
 import { ScannerPage } from './scanner.page';
 
 @NgModule({
@@ -13,8 +13,8 @@ import { ScannerPage } from './scanner.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    ScannerPageRoutingModule
+    ScannerPageRoutingModule,
   ],
-  declarations: [ScannerPage]
+  declarations: [ScannerPage, ]
 })
 export class ScannerPageModule {}

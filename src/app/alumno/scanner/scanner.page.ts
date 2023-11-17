@@ -15,8 +15,7 @@ import { BarcodeScanningModalComponent } from './barcode-scaning-modal.component
   templateUrl: './scanner.page.html',
   styleUrls: ['./scanner.page.scss'],
 })
-export class ScannerPage implements OnInit {
-
+export class ScannerPage implements OnInit  {
   public readonly barcodeFormat = BarcodeFormat;
   public readonly lensFacing = LensFacing;
 
@@ -36,7 +35,7 @@ export class ScannerPage implements OnInit {
   constructor(
     private readonly dialogService: DialogService,
     private readonly ngZone: NgZone
-  ) { }
+  ) {}
 
   public ngOnInit(): void {
     BarcodeScanner.isSupported().then((result) => {
