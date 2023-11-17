@@ -4,11 +4,15 @@ import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   {
+    path: 'not-found',
+    loadChildren: () => import('./not-found/not-found.module').then(m => m.NotFoundPageModule)
+  },
+  {
     path: 'loading-page',
     loadChildren: () => import('./loading-page/loading-page.module').then(m => m.LoadingPagePageModule)
     , canActivate: [AuthGuard]
   },
-  
+
   {
     path: 'alumno',
     loadChildren: () => import('./alumno/alumno.module').then(m => m.AlumnoPageModule)
@@ -29,20 +33,17 @@ const routes: Routes = [
     loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)
   },
   {
-    path: 'not-found',
-    loadChildren: () => import('./not-found/not-found.module').then(m => m.NotFoundPageModule)
-  },
-  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
   },
+
   {
     path: '**',
     redirectTo: 'not-found',
     pathMatch: 'full'
   },
-  
+
 
 
 

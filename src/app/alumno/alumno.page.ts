@@ -1,8 +1,9 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { DialogService } from '../services/dialog.service';
 import { Router } from '@angular/router';
 
-import { DialogService } from '../services/dialog.service';
+import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { AlumnoInfoService } from '../services/alumno-info.service';
 import {
   Barcode,
@@ -14,7 +15,7 @@ import { AsistenciaService } from '../services/asistencia.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
 import { SeguridadService } from '../services/seguridad.service';
-import { BarcodeScanningModalComponent } from './scanner/barcode-scaning-modal.component';
+import { BarcodeScanningModalComponent } from './barcode-scanning-modal.component';
 
 
 @Component({
@@ -73,6 +74,7 @@ export class AlumnoPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.installGoogleBarcodeScannerModule();
     BarcodeScanner.isSupported().then((result) => {
       this.isSupported = result.supported;
     });
@@ -203,6 +205,53 @@ export class AlumnoPage implements OnInit {
     this._auth.logout();
     this.router.navigateByUrl('login');
   }
+  public async startScan(): Promise<void> {
+    const formats = this.barcodeFormat.QrCode;
+    const lensFacing = this.lensFacing.Back
+    const element = await this.dialogService.showModal({
+      component: BarcodeScanningModalComponent,
+      // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
+      cssClass: 'barcode-scanning-modal',
+      showBackdrop: false,
+      componentProps: {
+        formats: formats,
+        lensFacing: lensFacing,
+      },
+    });
+    element.onDidDismiss().then((result) => {
+      const barcode: Barcode | undefined = result.data?.barcode;
+      if (barcode) {
+        this.barcodes = [barcode];
+      }
+    });
+  }
 
-  
+  public async readBarcodeFromImage(): Promise<void> {
+    const { files } = await FilePicker.pickImages({ multiple: false });
+    const path = files[0]?.path;
+    if (!path) {
+      return;
+    }
+    const formats:any = this.barcodeFormat.QrCode;
+    const { barcodes } = await BarcodeScanner.readBarcodesFromImage({
+      path,
+      formats,
+    });
+    this.barcodes = barcodes;
+  }
+
+  public async scan(): Promise<void> {
+    const formats:any = this.barcodeFormat.QrCode;
+    const { barcodes } = await BarcodeScanner.scan({
+      formats,
+    });
+    this.barcodes = barcodes;
+  }
+
+  public async installGoogleBarcodeScannerModule(): Promise<void> {
+    await BarcodeScanner.installGoogleBarcodeScannerModule();
+  }
+
+
+
 }
