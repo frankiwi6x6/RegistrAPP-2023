@@ -14,7 +14,7 @@ import { AsistenciaService } from '../services/asistencia.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
 import { SeguridadService } from '../services/seguridad.service';
-import { BarcodeScanningModalComponent } from './barcode-scaning-modal.component';
+import { BarcodeScanningModalComponent } from './scanner/barcode-scaning-modal.component';
 
 
 @Component({
@@ -176,11 +176,7 @@ export class AlumnoPage implements OnInit {
   }
 
   async escanearQR() {
-    if (this.resultadoScanner !== '') {
-      this.idClase = this.resultadoScanner.id_clase;
-      this.codigoSeguridad = this.resultadoScanner.codigo_seguridad;
-      this.marcarAsistencia();
-    }
+    this.router.navigateByUrl('alumno/scanner');
   }
 
   private mostrarError(tipoError: string, mensaje: string) {
@@ -208,52 +204,5 @@ export class AlumnoPage implements OnInit {
     this.router.navigateByUrl('login');
   }
 
-  public async startScan(): Promise<void> {
-    try {
-      const formats = this.formGroup.get('formats')?.value || [];
-      const lensFacing =
-        this.formGroup.get('lensFacing')?.value || LensFacing.Back;
-      const element = await this.dialogService.showModal({
-        component: BarcodeScanningModalComponent,
-        // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
-        cssClass: 'barcode-scanning-modal',
-        showBackdrop: false,
-        componentProps: {
-          formats: formats,
-          lensFacing: lensFacing,
-        },
-      });
-      element.onDidDismiss().then((result) => {
-        const barcode: Barcode | undefined = result.data?.barcode;
-        if (barcode) {
-          this.barcodes = [barcode];
-        }
-      });
-    }
-    catch (error){
-      this.alertas.tipoError = 'Error'
-      this.alertas.mensajeError = 'Error: ',error;
-      
-    }
-  }
-
-  public async scan(): Promise<void> {
-    const formats = this.formGroup.get('formats')?.value || [];
-    const { barcodes } = await BarcodeScanner.scan({
-      formats,
-    });
-    this.barcodes = barcodes;
-  }
-
-  public async openSettings(): Promise<void> {
-    await BarcodeScanner.openSettings();
-  }
-
-  public async installGoogleBarcodeScannerModule(): Promise<void> {
-    await BarcodeScanner.installGoogleBarcodeScannerModule();
-  }
-
-  public async requestPermissions(): Promise<void> {
-    await BarcodeScanner.requestPermissions();
-  }
+  
 }

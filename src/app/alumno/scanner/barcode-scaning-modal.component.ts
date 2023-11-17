@@ -8,7 +8,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { DialogService } from '../services/dialog.service';
+import { DialogService } from '../../services/dialog.service';
 import {
   Barcode,
   BarcodeFormat,

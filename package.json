@@ -32,6 +32,7 @@
     "@capacitor/preferences": "^5.0.6",
     "@capacitor/status-bar": "5.0.6",
     "@capacitor/storage": "^1.2.5",
+    "@capawesome/capacitor-file-picker": "^5.1.1",
     "@ionic/angular": "^7.0.0",
     "@supabase/supabase-js": "^2.33.2",
     "dotenv": "^16.3.1",
