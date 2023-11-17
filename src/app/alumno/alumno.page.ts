@@ -236,16 +236,18 @@ export class AlumnoPage implements OnInit {
       });
       this.barcodes = barcodes;
       this.QR = JSON.parse(this.barcodes[0].rawValue);
-    //   this.alertas.tipoError = 'Resultado del escaneo';
-    //   this.alertas.mensajeError = `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase }`  + `
-    //   Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad }
-    //   `;
-      this.alertas.showAlert();
+      //   this.alertas.tipoError = 'Resultado del escaneo';
+      //   this.alertas.mensajeError = `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase }`  + `
+      //   Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad }
+      //   `;
+      // this.alertas.showAlert();
       this.idClase = this.QR.id_clase;
       this.codigoSeguridad = this.QR.codigo_seguridad;
       console.log(this.idClase);
       console.log(this.codigoSeguridad);
-      this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
+      setTimeout(() => {
+        this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
+      }, 1000);
     }
     catch (error) {
       // this.alertas.tipoError = 'Error al escanear';
