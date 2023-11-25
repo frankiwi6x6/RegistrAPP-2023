@@ -14,8 +14,8 @@
   <div *ngIf="alumnoInfo" class="ion-padding">
     <h2>Bienvenido {{ alumnoInfo.nombre }}</h2>
   </div>
-  <ion-grid>
-    <!-- <ion-row>
+  <!--  <ion-grid>
+    <ion-row>
       <ion-col size="12">
         <ion-item class="input">
 
@@ -32,11 +32,11 @@
             placeholder="Código de seguridad" input-mode="number"></ion-input>
         </ion-item>
       </ion-col>
-    </ion-row> -->
-  </ion-grid>
+    </ion-row> 
+  </ion-grid>-->
 
   <ion-button expand="block" (click)="scan()" [disabled]="!isSupported">Escanear código QR</ion-button>
-  <ion-button expand="full" (click)="marcarAsistencia(QR.id_clase, QR.codigo_seguridad)" class="ion-margin-top">Marcar Asistencia</ion-button>
+  <!-- <ion-button expand="full" (click)="marcarAsistencia(QR.id_clase, QR.codigo_seguridad)" class="ion-margin-top">Marcar Asistencia</ion-button> -->
 
   <ion-button expand="full" (click)="logout()" color="danger" class="ion-margin-top">Cerrar Sesión</ion-button>
 

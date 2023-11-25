@@ -242,6 +242,7 @@ export class AlumnoPage implements OnInit {
       //   `;
       // this.alertas.showAlert();
       this.idClase = this.QR.id_clase;
+      await this.obtenerCodigoSeguridad(this.idClase);
       this.codigoSeguridad = this.QR.codigo_seguridad;
       console.log(this.idClase);
       console.log(this.codigoSeguridad);
