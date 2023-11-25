@@ -75,7 +75,7 @@ export class ProfesorPage implements OnInit {
     this.qrCreado = true;
     const qrText = JSON.stringify({ id_clase: id_clase, codigo_seguridad: codigo_seguridad });
     setTimeout(() => {
-      QRCode.toCanvas(document.getElementById('qrcodeCanvas'), qrText, (error) => {
+      QRCode.toCanvas(document.getElementById('qrcodeCanvas'), qrText, (error:any) => {
         if (error) {
           console.error('Error al generar el código QR:', error);
         } else {
@@ -125,7 +125,7 @@ export class ProfesorPage implements OnInit {
       .subscribe(
         (data) => {
           if (data === 'La clase ya existe para esta sección y fecha.') {
-            this.mostrarError(data);
+            this.alertas.showAlert('Error al crear la clase',data);
           } else {
             this.infoClase = data[0];
             this.claseCreada = true;
@@ -144,7 +144,7 @@ export class ProfesorPage implements OnInit {
     if (this.infoClase === undefined) {
       this.obtenerInformacionDeClase(seccion.id, fecha);
     } else {
-      this.mostrarError('Ya se ha creado clase para esta sección hoy.');
+      this.alertas.showAlert('Error al crear clase:', 'Ya se ha creado clase para esta sección hoy.');
     }
   }
 
@@ -158,7 +158,7 @@ export class ProfesorPage implements OnInit {
       (respuesta) => {
         if (respuesta.length > 0) {
           this.infoClase = respuesta[0];
-          this.mostrarError('Ya se ha iniciado el registro para esta clase.');
+          this.alertas.showAlert('Error al crear clase:', 'Ya se ha iniciado el registro para esta clase.');
           console.log(this.infoClase);
           this.obtenerAsistencia(this.infoClase.id);
           this.obtenerInfoSeguridad(this.infoClase.id, fecha);
@@ -171,7 +171,7 @@ export class ProfesorPage implements OnInit {
           this._clase.crearClase(data).subscribe(
             (creacion) => {
               console.log('Registro exitoso:', creacion);
-              this.mostrarExito('Se ha registrado la clase exitosamente');
+              this.alertas.showAlert('Exito al crear la clase!','Se ha registrado la clase exitosamente');
 
               this.infoClase = creacion;
               this._clase.comprobarClase(idSeccion, fecha).subscribe(
@@ -187,7 +187,7 @@ export class ProfesorPage implements OnInit {
             },
             (error) => {
               console.error('Error al crear clase:', error);
-              this.mostrarError('No se pudo crear la clase.');
+              this.alertas.showAlert('Error al crear la clase','No se pudo crear la clase.');
             }
           );
 
@@ -195,7 +195,7 @@ export class ProfesorPage implements OnInit {
       },
       (error) => {
         console.error('Error al comprobar la clase:', error);
-        this.mostrarError('No se pudo comprobar la clase.');
+        this.alertas.showAlert('Error al crear la clase','No se pudo comprobar la clase.');
       }
     );
   }
@@ -214,21 +214,6 @@ export class ProfesorPage implements OnInit {
         console.log(error);
       }
     );
-  }
-
-
-
-
-  private mostrarExito(mensaje: string): void {
-    this.alertas.tipoError = 'Registro exitoso';
-    this.alertas.mensajeError = mensaje;
-    this.alertas.showAlert();
-  }
-
-  private mostrarError(mensaje: string): void {
-    this.alertas.tipoError = 'Error al crear clase';
-    this.alertas.mensajeError = mensaje;
-    this.alertas.showAlert();
   }
 
   crearSeguridad(id_clase: string) {

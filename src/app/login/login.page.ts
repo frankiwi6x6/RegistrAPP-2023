@@ -29,7 +29,7 @@ export class LoginPage implements OnInit {
   login() {
     if (this.username === '' || this.password === '') {
       console.log('Debe ingresar un usuario');
-      this.mostrarAlerta('Credenciales vacías', 'Debe rellenar los campos de usuario y contraseña');
+      this.alertas.showAlert('Credenciales vacías', 'Debe rellenar los campos de usuario y contraseña');
     }
     if (this.username !== '' && this.password !== '') {
       this._auth.logout();
@@ -41,7 +41,7 @@ export class LoginPage implements OnInit {
             console.log(this.infoUser);
             if (this.infoUser === undefined) {
               console.log('Usuario no encontrado');
-              this.mostrarAlerta('Usuario no encontrado', 'Verifique su contrañeña y/o usuario');
+              this.alertas.showAlert('Usuario no encontrado', 'Verifique su contrañeña y/o usuario');
             } else {
               console.log('Usuario encontrado');
               this._auth.setCurrentUser(this.infoUser);
@@ -72,10 +72,5 @@ export class LoginPage implements OnInit {
     console.log('recuperarContrasenna');
     this.router.navigateByUrl('recuperar-contrasena');
 
-  }
-  private mostrarAlerta(tipoError: string, mensaje: string) {
-    this.alertas.tipoError = tipoError;
-    this.alertas.mensajeError = mensaje;
-    this.alertas.showAlert();
   }
 }

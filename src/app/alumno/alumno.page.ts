@@ -2,8 +2,15 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { DialogService } from '../services/dialog.service';
 import { Router } from '@angular/router';
+
+import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { AlumnoInfoService } from '../services/alumno-info.service';
-import { Barcode, BarcodeFormat, BarcodeScanner, LensFacing, } from '@capacitor-mlkit/barcode-scanning';
+import {
+  Barcode,
+  BarcodeFormat,
+  BarcodeScanner,
+  LensFacing,
+} from '@capacitor-mlkit/barcode-scanning';
 import { AsistenciaService } from '../services/asistencia.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
@@ -98,7 +105,7 @@ export class AlumnoPage implements OnInit {
         this.obtenerInfoDelAlumno(this.userInfo.id);
         if (this.alumnoPresente === false) {
           setInterval(() => {
-            if (this.idClase !== '' && this.alumnoPresente === false && this.codigoSeguridad === this.codigoDB) {
+            if (this.idClase !== '' && this.alumnoPresente === false) {
               this.obtenerCodigoSeguridad(this.idClase);
             }
           }, 5000);
@@ -126,17 +133,17 @@ export class AlumnoPage implements OnInit {
 
   async marcarAsistencia(idClase: string, codigoDeSeguridad: string) {
     if (!this.alumnoInfo) {
-      this.mostrarError(this.TIPO_ERROR, this.MSJ_SIN_USUARIO);
+      this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_SIN_USUARIO);
       return;
     }
     if (idClase === '') {
-      this.mostrarError(this.TIPO_ERROR, this.MSJ_SIN_ID_CLASE);
+      this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_SIN_ID_CLASE);
       return;
     }
     try {
       const respuesta = await this.asistencia.getEstadoAlumno(idClase, this.alumnoInfo.id).toPromise();
       if (respuesta[0].isPresente) {
-        this.mostrarError(this.TIPO_IS_PRESENTE, this.MSJ_IS_PRESENTE);
+        this.alertas.showAlert(this.TIPO_IS_PRESENTE, this.MSJ_IS_PRESENTE);
         this.alumnoPresente = true;
         return;
       } else {
@@ -154,20 +161,20 @@ export class AlumnoPage implements OnInit {
             console.log('Ya está presente en esta clase.');
           } else {
             console.log('Actualización exitosa:', actualizacionExitosa);
-            this.mostrarError(this.TIPO_EXITO, this.MSJ_EXITO);
+            this.alertas.showAlert(this.TIPO_EXITO, this.MSJ_EXITO);
             this.alumnoPresente = true;
           }
         } else {
           if (codigoDeSeguridad === undefined) {
-            this.mostrarError(this.TIPO_ERROR, this.MSJ_CODIGO_VACIO);
+            this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_CODIGO_VACIO);
           } else {
-            this.mostrarError(this.TIPO_ERROR, this.MSJ_CODIGO_NO_VALIDO);
+            this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_CODIGO_NO_VALIDO);
           }
         }
       }
     } catch (error) {
       console.error('Error al marcar asistencia:', error);
-      this.mostrarError(this.TIPO_ERROR, this.MSJ_ERROR_MARCADO);
+      this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_ERROR_MARCADO);
     }
   }
 
@@ -175,11 +182,6 @@ export class AlumnoPage implements OnInit {
     this.router.navigateByUrl('alumno/scanner');
   }
 
-  private mostrarError(tipoError: string, mensaje: string) {
-    this.alertas.tipoError = tipoError;
-    this.alertas.mensajeError = mensaje;
-    this.alertas.showAlert();
-  }
 
   private obtenerCodigoSeguridad(id_clase: string) {
     this._seguridad.getSeguridad(id_clase).subscribe(
@@ -199,27 +201,6 @@ export class AlumnoPage implements OnInit {
     this._auth.logout();
     this.router.navigateByUrl('login');
   }
-  public async startScan(): Promise<void> {
-    const formats = this.barcodeFormat.QrCode;
-    const lensFacing = this.lensFacing.Back
-    const element = await this.dialogService.showModal({
-      component: BarcodeScanningModalComponent,
-      // Set `visibility` to `visible` to show the modal (see `src/theme/variables.scss`)
-      cssClass: 'barcode-scanning-modal',
-      showBackdrop: false,
-      componentProps: {
-        formats: formats,
-        lensFacing: lensFacing,
-      },
-    });
-    element.onDidDismiss().then((result: any) => {
-      const barcode: Barcode | undefined = result.data?.barcode;
-      if (barcode) {
-        this.barcodes = [barcode];
-      }
-    });
-  }
-
 
   public async scan(): Promise<void> {
     try {
@@ -227,41 +208,26 @@ export class AlumnoPage implements OnInit {
       const { barcodes } = await BarcodeScanner.scan({
         formats,
       });
+      this.barcodes = barcodes;
+      this.QR = JSON.parse(this.barcodes[0].rawValue);
+      //   this.alertas.tipoError = 'Resultado del escaneo';
+      //   this.alertas.mensajeError = `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase }`  + `
+      //   Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad }
+      //   `;
+      // this.alertas.showAlert();
+      this.idClase = this.QR.id_clase;
+      await this.alertas.showAlert("Esta es su clase?", `ID: ${this.idClase}, Contraseña: , ${this.QR.codigo_seguridad}`)
 
-      if (barcodes.length > 0) {
-        this.barcodes = barcodes;
-        this.QR = JSON.parse(this.barcodes[0].rawValue);
-        this.alertas.tipoError = 'Resultado del escaneo';
-        this.alertas.mensajeError = `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase}` + `
-          Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad}
-        `;
-        this.alertas.showAlert();
-        this.idClase = this.QR.id_clase;
-        await this.obtenerCodigoSeguridad(this.idClase);
-        this.codigoSeguridad = this.QR.codigo_seguridad;
-        console.log(this.idClase);
-        console.log(this.codigoSeguridad);
+      console.log(this.idClase);
+      console.log(this.codigoSeguridad);
 
-        // Asegúrate de que el usuario confirme antes de marcar la asistencia
-        const confirmacion = await this.mostrarConfirmacion();
+      this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
 
-        if (confirmacion) {
-          this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
-        } else {
-          // El usuario canceló la confirmación, puedes manejarlo según tus necesidades.
-          console.log('Confirmación cancelada');
-        }
-      }
-    } catch (error) {
-      this.alertas.tipoError = 'Error al escanear';
-      this.alertas.mensajeError = `${error}`;
     }
-  }
-
-  async mostrarConfirmacion(): Promise<boolean> {
-    const mensaje =
-      '¿Estás seguro de que deseas marcar la asistencia con este código QR?';
-    return await this.alertas.mostrarConfirmacion(mensaje);
+    catch (error) {
+      // this.alertas.tipoError = 'Error al escanear';
+      // this.alertas.mensajeError = `${error}`;
+    }
   }
   public async installGoogleBarcodeScannerModule(): Promise<void> {
     await BarcodeScanner.installGoogleBarcodeScannerModule();
