@@ -208,31 +208,43 @@ export class AlumnoPage implements OnInit {
       const { barcodes } = await BarcodeScanner.scan({
         formats,
       });
-      this.barcodes = barcodes;
-      this.QR = JSON.parse(this.barcodes[0].rawValue);
-      //   this.alertas.tipoError = 'Resultado del escaneo';
-      //   this.alertas.mensajeError = `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase }`  + `
-      //   Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad }
-      //   `;
-      // this.alertas.showAlert();
-      this.idClase = this.QR.id_clase;
-      await this.alertas.showAlert("Esta es su clase?", `ID: ${this.idClase}, Contraseña: , ${this.QR.codigo_seguridad}`)
 
-      console.log(this.idClase);
-      console.log(this.codigoSeguridad);
+      if (barcodes.length > 0) {
+        this.barcodes = barcodes;
+        this.QR = JSON.parse(this.barcodes[0].rawValue);
+        this.alertas.showAlert('Resultado del escaneo', `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase}` + `
+        Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad}
+      `);
+        this.idClase = this.QR.id_clase;
+        await this.obtenerCodigoSeguridad(this.idClase);
+        this.codigoSeguridad = this.QR.codigo_seguridad;
+        console.log(this.idClase);
+        console.log(this.codigoSeguridad);
 
-      this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
+        // Asegúrate de que el usuario confirme antes de marcar la asistencia
+        const confirmacion = await this.mostrarConfirmacion();
 
+        if (confirmacion) {
+          this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
+        } else {
+          // El usuario canceló la confirmación, puedes manejarlo según tus necesidades.
+          console.log('Confirmación cancelada');
+        }
+      }
+    } catch (error) {
+      this.alertas.tipoError = 'Error al escanear';
+      this.alertas.mensajeError = `${error}`;
     }
-    catch (error) {
-      // this.alertas.tipoError = 'Error al escanear';
-      // this.alertas.mensajeError = `${error}`;
-    }
+  }
+
+  async mostrarConfirmacion(): Promise<boolean> {
+    const mensaje =
+      '¿Estás seguro de que deseas marcar la asistencia con este código QR?';
+    return await this.alertas.mostrarConfirmacion(mensaje);
   }
   public async installGoogleBarcodeScannerModule(): Promise<void> {
     await BarcodeScanner.installGoogleBarcodeScannerModule();
   }
-
 
 
 }
