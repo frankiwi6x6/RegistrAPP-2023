@@ -2,15 +2,8 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { DialogService } from '../services/dialog.service';
 import { Router } from '@angular/router';
-
-import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { AlumnoInfoService } from '../services/alumno-info.service';
-import {
-  Barcode,
-  BarcodeFormat,
-  BarcodeScanner,
-  LensFacing,
-} from '@capacitor-mlkit/barcode-scanning';
+import { Barcode, BarcodeFormat, BarcodeScanner, LensFacing, } from '@capacitor-mlkit/barcode-scanning';
 import { AsistenciaService } from '../services/asistencia.service';
 import { AlertControllerService } from '../services/alert-controller.service';
 import { AuthService } from '../services/auth.service';
@@ -76,16 +69,16 @@ export class AlumnoPage implements OnInit {
 
   ngOnInit() {
     this.installGoogleBarcodeScannerModule();
-    BarcodeScanner.isSupported().then((result) => {
+    BarcodeScanner.isSupported().then((result: any) => {
       this.isSupported = result.supported;
     });
-    BarcodeScanner.checkPermissions().then((result) => {
+    BarcodeScanner.checkPermissions().then((result: any) => {
       this.isPermissionGranted = result.camera === 'granted';
     });
     BarcodeScanner.removeAllListeners().then(() => {
       BarcodeScanner.addListener(
         'googleBarcodeScannerModuleInstallProgress',
-        (event) => {
+        (event: any) => {
           this.ngZone.run(() => {
             console.log('googleBarcodeScannerModuleInstallProgress', event);
             const { state, progress } = event;
@@ -105,7 +98,7 @@ export class AlumnoPage implements OnInit {
         this.obtenerInfoDelAlumno(this.userInfo.id);
         if (this.alumnoPresente === false) {
           setInterval(() => {
-            if (this.idClase !== '' && this.alumnoPresente === false) {
+            if (this.idClase !== '' && this.alumnoPresente === false && this.codigoSeguridad === this.codigoDB) {
               this.obtenerCodigoSeguridad(this.idClase);
             }
           }, 5000);
@@ -119,13 +112,13 @@ export class AlumnoPage implements OnInit {
   obtenerInfoDelAlumno(id: string) {
     this._alumno.getAllAlumnoInfo(id)
       .subscribe(
-        (data) => {
+        (data: any) => {
           this.alumnoInfo = data[0];
           this.seccionesInscritas = this.alumnoInfo.alumno_seccion
           console.log(this.alumnoInfo)
           console.log(this.seccionesInscritas)
         },
-        (error) => {
+        (error: any) => {
           console.error('Error al obtener información del alumno:', error);
         }
       );
@@ -190,11 +183,11 @@ export class AlumnoPage implements OnInit {
 
   private obtenerCodigoSeguridad(id_clase: string) {
     this._seguridad.getSeguridad(id_clase).subscribe(
-      (respuesta) => {
+      (respuesta: any) => {
         this.codigoDB = respuesta[0].codigo;
         console.log(this.codigoDB);
       },
-      (error) => {
+      (error: any) => {
         console.error('Error al obtener información de seguridad:', error);
         console.log(error);
       }
@@ -219,7 +212,7 @@ export class AlumnoPage implements OnInit {
         lensFacing: lensFacing,
       },
     });
-    element.onDidDismiss().then((result) => {
+    element.onDidDismiss().then((result: any) => {
       const barcode: Barcode | undefined = result.data?.barcode;
       if (barcode) {
         this.barcodes = [barcode];
@@ -234,24 +227,41 @@ export class AlumnoPage implements OnInit {
       const { barcodes } = await BarcodeScanner.scan({
         formats,
       });
-      this.barcodes = barcodes;
-      this.QR = JSON.parse(this.barcodes[0].rawValue);
-    //   this.alertas.tipoError = 'Resultado del escaneo';
-    //   this.alertas.mensajeError = `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase }`  + `
-    //   Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad }
-    //   `;
-      this.alertas.showAlert();
-      this.idClase = this.QR.id_clase;
-      await this.obtenerCodigoSeguridad(this.idClase);
-      this.codigoSeguridad = this.QR.codigo_seguridad;
-      console.log(this.idClase);
-      console.log(this.codigoSeguridad);
-      this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
+
+      if (barcodes.length > 0) {
+        this.barcodes = barcodes;
+        this.QR = JSON.parse(this.barcodes[0].rawValue);
+        this.alertas.tipoError = 'Resultado del escaneo';
+        this.alertas.mensajeError = `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase}` + `
+          Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad}
+        `;
+        this.alertas.showAlert();
+        this.idClase = this.QR.id_clase;
+        await this.obtenerCodigoSeguridad(this.idClase);
+        this.codigoSeguridad = this.QR.codigo_seguridad;
+        console.log(this.idClase);
+        console.log(this.codigoSeguridad);
+
+        // Asegúrate de que el usuario confirme antes de marcar la asistencia
+        const confirmacion = await this.mostrarConfirmacion();
+
+        if (confirmacion) {
+          this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
+        } else {
+          // El usuario canceló la confirmación, puedes manejarlo según tus necesidades.
+          console.log('Confirmación cancelada');
+        }
+      }
+    } catch (error) {
+      this.alertas.tipoError = 'Error al escanear';
+      this.alertas.mensajeError = `${error}`;
     }
-    catch (error) {
-      // this.alertas.tipoError = 'Error al escanear';
-      // this.alertas.mensajeError = `${error}`;
-    }
+  }
+
+  async mostrarConfirmacion(): Promise<boolean> {
+    const mensaje =
+      '¿Estás seguro de que deseas marcar la asistencia con este código QR?';
+    return await this.alertas.mostrarConfirmacion(mensaje);
   }
   public async installGoogleBarcodeScannerModule(): Promise<void> {
     await BarcodeScanner.installGoogleBarcodeScannerModule();
