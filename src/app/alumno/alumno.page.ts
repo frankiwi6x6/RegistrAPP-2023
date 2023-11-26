@@ -17,6 +17,8 @@ import { AuthService } from '../services/auth.service';
 import { SeguridadService } from '../services/seguridad.service';
 import { BarcodeScanningModalComponent } from './barcode-scanning-modal.component';
 import { type } from 'os';
+import { Observable } from 'rxjs/internal/Observable';
+import { catchError, map, of } from 'rxjs';
 
 
 @Component({
@@ -51,6 +53,7 @@ export class AlumnoPage implements OnInit {
   alumnoPresente: boolean = false;
   resultadoScanner: any = '';
   content_visibility = ''
+  consoleLogs: string;
 
   TIPO_ERROR = 'Error al marcar asistencia.';
   TIPO_IS_PRESENTE = 'Usted ya está presente.'
@@ -62,6 +65,7 @@ export class AlumnoPage implements OnInit {
   MSJ_ERROR_MARCADO = 'Ocurrió un error al marcar asistencia.';
   MSJ_CODIGO_NO_VALIDO = 'El código de seguridad ingresado no es válido'
   MSJ_CODIGO_VACIO = 'Debe ingresar un código de seguridad.'
+
 
   constructor(
     private router: Router,
@@ -88,6 +92,7 @@ export class AlumnoPage implements OnInit {
         (event: any) => {
           this.ngZone.run(() => {
             console.log('googleBarcodeScannerModuleInstallProgress', event);
+            this.addToConsoleLogs('googleBarcodeScannerModuleInstallProgress ' + event);
             const { state, progress } = event;
             this.formGroup.patchValue({
               googleBarcodeScannerModuleInstallState: state,
@@ -103,13 +108,7 @@ export class AlumnoPage implements OnInit {
         this.userInfo = user;
         console.log(this.userInfo);
         this.obtenerInfoDelAlumno(this.userInfo.id);
-        if (this.alumnoPresente === false) {
-          setInterval(() => {
-            if (this.idClase !== '' && this.alumnoPresente === false) {
-              this.obtenerCodigoSeguridad(this.idClase);
-            }
-          }, 5000);
-        }
+
       } else {
         this.router.navigateByUrl('login');
       }
@@ -121,80 +120,103 @@ export class AlumnoPage implements OnInit {
       .subscribe(
         (data: any) => {
           this.alumnoInfo = data[0];
-          this.seccionesInscritas = this.alumnoInfo.alumno_seccion
-          console.log(this.alumnoInfo)
-          console.log(this.seccionesInscritas)
+          this.seccionesInscritas = this.alumnoInfo.alumno_seccion;
+          this.addToConsoleLogs('Información del alumno obtenida con éxito');
+          console.log(this.alumnoInfo);
+          console.log(this.seccionesInscritas);
         },
         (error: any) => {
+          this.addToConsoleLogs('Error al obtener información del alumno');
           console.error('Error al obtener información del alumno:', error);
         }
       );
   }
 
   async marcarAsistencia(idClase: string, codigoDeSeguridad: string) {
+    this.addToConsoleLogs('Iniciando marcado de asistencia');
+
     if (!this.alumnoInfo) {
       this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_SIN_USUARIO);
       return;
     }
+
     if (idClase === '') {
       this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_SIN_ID_CLASE);
       return;
     }
+
     try {
       const respuesta = await this.asistencia.getEstadoAlumno(idClase, this.alumnoInfo.id).toPromise();
+
       if (respuesta[0].isPresente) {
         this.alertas.showAlert(this.TIPO_IS_PRESENTE, this.MSJ_IS_PRESENTE);
         this.alumnoPresente = true;
         return;
       } else {
+        // Llamamos a obtenerCodigoSeguridad antes de intentar marcar la asistencia
+        const codigoSeguridadDB: number | undefined = await this.obtenerCodigoSeguridad(idClase).toPromise();
+
+        // Convertir codigoDeSeguridad a número si es una cadena
+        const codigoDeSeguridadNum: number | undefined = parseInt(codigoDeSeguridad);
+
         const ahora = new Date();
         const fecha = ahora.getFullYear() + '-' + (ahora.getMonth() + 1) + '-' + ahora.getDate();
         const hora = ahora.getHours() + ':' + ahora.getMinutes() + ':' + ahora.getSeconds();
-        await this.obtenerCodigoSeguridad(idClase)
+
         const data: any = {
           isPresente: true,
           hora: hora
         };
-        if (parseInt(codigoDeSeguridad) === this.codigoDB) {
+
+        // Comparamos con el código de seguridad obtenido de la base de datos
+        if (
+          codigoDeSeguridadNum !== undefined &&
+          codigoSeguridadDB !== undefined &&
+          codigoDeSeguridadNum === codigoSeguridadDB
+        ) {
           const actualizacionExitosa = await this.asistencia.patchAsistenciaPorFechaYAlumno(idClase, fecha, this.alumnoInfo.id, data).toPromise();
+
           if (actualizacionExitosa) {
             console.log('Ya está presente en esta clase.');
+            this.addToConsoleLogs('Ya está presente en esta clase.');
+
           } else {
             console.log('Actualización exitosa:', actualizacionExitosa);
+
+            this.addToConsoleLogs('Marcado de asistencia exitoso');
             this.alertas.showAlert(this.TIPO_EXITO, this.MSJ_EXITO);
             this.alumnoPresente = true;
           }
         } else {
           if (codigoDeSeguridad === undefined) {
             this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_CODIGO_VACIO);
+            this.addToConsoleLogs('Código de seguridad vacío');
           } else {
             this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_CODIGO_NO_VALIDO);
+            this.addToConsoleLogs('Código de seguridad no válido');
           }
         }
       }
     } catch (error) {
+      this.addToConsoleLogs('Error al marcar asistencia');
       console.error('Error al marcar asistencia:', error);
       this.alertas.showAlert(this.TIPO_ERROR, this.MSJ_ERROR_MARCADO);
     }
   }
 
-  async escanearQR() {
-    this.router.navigateByUrl('alumno/scanner');
-  }
 
 
-  private obtenerCodigoSeguridad(id_clase: string) {
-    this._seguridad.getSeguridad(id_clase).subscribe(
-      (respuesta: any) => {
-        this.codigoDB = respuesta[0].codigo;
-        console.log(this.codigoDB);
-      },
-      (error: any) => {
+  private obtenerCodigoSeguridad(id_clase: string): Observable<number | undefined> {
+    return this._seguridad.getSeguridad(id_clase).pipe(
+      map((respuesta: any) => respuesta[0]?.codigo),
+      catchError((error: any) => {
         console.error('Error al obtener información de seguridad:', error);
-        console.log(error);
-      }
+        this.addToConsoleLogs('Error al obtener información de seguridad ' + error);
+        return of(undefined); // Devolver Observable con valor undefined en caso de error
+      })
     );
   }
+
 
   logout() {
     this.userInfo = undefined;
@@ -212,26 +234,25 @@ export class AlumnoPage implements OnInit {
       if (barcodes.length > 0) {
         this.barcodes = barcodes;
         this.QR = JSON.parse(this.barcodes[0].rawValue);
-        this.alertas.showAlert('Resultado del escaneo', `ID clase: ${this.QR.id_clase}, ${typeof this.QR.id_clase}` + `
-        Código de seguridad: ${this.QR.codigo_seguridad} ${typeof this.QR.codigo_seguridad}
-      `);
-        this.idClase = this.QR.id_clase;
-        await this.obtenerCodigoSeguridad(this.idClase);
-        this.codigoSeguridad = this.QR.codigo_seguridad;
-        console.log(this.idClase);
-        console.log(this.codigoSeguridad);
+
+        // Mostramos los datos del QR en la consola
+        console.log('ID clase:', this.QR.id_clase);
+        console.log('Código de seguridad:', this.QR.codigo_seguridad);
 
         // Asegúrate de que el usuario confirme antes de marcar la asistencia
         const confirmacion = await this.mostrarConfirmacion();
 
         if (confirmacion) {
+          // Al hacer clic en "Aceptar"
+          this.addToConsoleLogs('Confirmando asistencia...');
           this.marcarAsistencia(this.QR.id_clase, this.QR.codigo_seguridad);
         } else {
-          // El usuario canceló la confirmación, puedes manejarlo según tus necesidades.
-          console.log('Confirmación cancelada');
+          // Al hacer clic en "Cancelar"
+          this.addToConsoleLogs('Confirmación cancelada');
         }
       }
     } catch (error) {
+      this.addToConsoleLogs('Error al escanear');
       this.alertas.tipoError = 'Error al escanear';
       this.alertas.mensajeError = `${error}`;
     }
@@ -240,11 +261,26 @@ export class AlumnoPage implements OnInit {
   async mostrarConfirmacion(): Promise<boolean> {
     const mensaje =
       '¿Estás seguro de que deseas marcar la asistencia con este código QR?';
-    return await this.alertas.mostrarConfirmacion(mensaje);
+
+    // Mostramos los datos del QR en la consola
+    console.log('ID clase:', this.QR.id_clase);
+    console.log('Código de seguridad:', this.QR.codigo_seguridad);
+
+    const confirmacion = window.confirm(mensaje);
+
+    // Mostramos en la consola si se aceptó o se canceló
+    console.log('Confirmación:', confirmacion ? 'Aceptada' : 'Cancelada');
+
+    return confirmacion;
   }
+
+
   public async installGoogleBarcodeScannerModule(): Promise<void> {
     await BarcodeScanner.installGoogleBarcodeScannerModule();
   }
 
+  private addToConsoleLogs(log: string) {
+    this.consoleLogs += `${log}\n`;
+  }
 
 }

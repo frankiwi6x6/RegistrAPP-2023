@@ -13,6 +13,7 @@ export class LoginPage implements OnInit {
   infoUser: any = null;
   username: string = '';
   password: string = '';
+  consoleLogs: string = '';  // Nueva variable
 
 
   constructor(
@@ -29,9 +30,9 @@ export class LoginPage implements OnInit {
   login() {
     if (this.username === '' || this.password === '') {
       console.log('Debe ingresar un usuario');
+      this.addToConsoleLogs('Debe ingresar un usuario');
       this.alertas.showAlert('Credenciales vacías', 'Debe rellenar los campos de usuario y contraseña');
-    }
-    if (this.username !== '' && this.password !== '') {
+    } else {
       this._auth.logout();
       console.log('login');
       this._user.getUserInfo(this.username, this.password)
@@ -44,12 +45,15 @@ export class LoginPage implements OnInit {
               this.alertas.showAlert('Usuario no encontrado', 'Verifique su contrañeña y/o usuario');
             } else {
               console.log('Usuario encontrado');
+              this.addToConsoleLogs('Usuario encontrado');
               this._auth.setCurrentUser(this.infoUser);
               if (this.infoUser.tipo_usuario === 'profesor') {
                 console.log('Usuario profesor');
+                this.addToConsoleLogs('Usuario profesor');
                 this.router.navigateByUrl(this.infoUser.tipo_usuario);
               } else {
                 console.log('Usuario alumno');
+                this.addToConsoleLogs('Usuario alumno');
                 this.router.navigateByUrl(this.infoUser.tipo_usuario);
               }
 
@@ -63,6 +67,7 @@ export class LoginPage implements OnInit {
           },
           (error) => {
             console.error('Error al obtener información del usuario:', error);
+            this.addToConsoleLogs('Error al obtener información del usuario '+ error);
           }
         );
     }
@@ -72,5 +77,8 @@ export class LoginPage implements OnInit {
     console.log('recuperarContrasenna');
     this.router.navigateByUrl('recuperar-contrasena');
 
+  }
+  private addToConsoleLogs(log: string) {
+    this.consoleLogs += `${log}\n`;
   }
 }
